@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Porch model</title>
+<style>
+  :root { --bg: #dfe7ec; --card: rgba(255,255,255,0.92); --ink: #1f2a30; --muted: #4a5a63; --line: #b8c6ce;
+          --old: #7a5a36; --new: #3d5a6b; --view: #1f5f8b; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg);
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--ink); }
+  canvas { display: block; touch-action: none; position: fixed; inset: 0; z-index: 0; }
+  .top, .info, .bottom { z-index: 10; }
+  button { font: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+
+  .top { position: fixed; top: 0; left: 0; right: 0; padding: calc(env(safe-area-inset-top, 0px) + 10px) 12px 0;
+         display: flex; align-items: flex-start; gap: 8px; pointer-events: none; }
+  .title { pointer-events: auto; background: var(--card); border-radius: 12px; padding: 8px 12px; flex: 1; min-width: 0; }
+  .title h1 { font-size: 15px; font-weight: 600; margin: 0; }
+  .title p { margin: 2px 0 0; font-size: 13px; color: var(--muted); line-height: 1.35; }
+  .info-btn { pointer-events: auto; width: 44px; height: 44px; border-radius: 12px; border: none; background: var(--card);
+              font-size: 18px; flex: none; }
+  .info { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top, 0px) + 64px);
+          background: var(--card); border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.6;
+          color: var(--muted); display: none; max-width: 420px; margin-left: auto; }
+  .info.open { display: block; }
+  .info b { color: var(--ink); font-weight: 600; }
+  .info hr { border: none; border-top: 1px solid var(--line); margin: 8px 0; }
+
+  .bottom { position: fixed; left: 0; right: 0; bottom: 0; padding: 0 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
+            display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .bottom > * { pointer-events: auto; }
+  .stepper { display: flex; align-items: center; gap: 8px; margin: 0 12px; }
+  .stepper button.arrow { width: 44px; height: 44px; border-radius: 12px; border: none; background: var(--card); font-size: 20px; flex: none; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; scroll-snap-type: x proximity; padding: 2px 12px;
+           scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button { flex: none; scroll-snap-align: center; min-height: 40px; padding: 8px 12px; border-radius: 20px;
+                  border: 1px solid var(--line); background: var(--card); font-size: 13px; white-space: nowrap; }
+  .chips button.old.on { background: var(--old); border-color: var(--old); color: #fff; }
+  .chips button.new.on { background: var(--new); border-color: var(--new); color: #fff; }
+  .chips button.bare.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .chips .sep { flex: none; align-self: center; font-size: 11px; color: var(--muted); padding: 0 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .views { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 0 12px; background: var(--card);
+           border-radius: 12px; padding: 4px; }
+  .views button { border: none; background: transparent; min-height: 40px; border-radius: 9px; font-size: 13px; }
+  .views button.on { background: var(--view); color: #fff; }
+  .views button:focus-visible, .chips button:focus-visible { outline: 2px solid var(--view); outline-offset: 2px; }
+
+  @media (min-width: 700px) {
+    .title { flex: none; max-width: 420px; }
+    .views { max-width: 420px; }
+    .bottom { padding-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="title">
+    <h1 id="optTitle">Existing porch</h1>
+    <p id="optDesc">Slab, window and the current 10 shallow steps.</p>
+  </div>
+  <button class="info-btn" id="infoBtn" aria-label="Show dimensions and help" aria-expanded="false">ⓘ</button>
+</div>
+<div class="info" id="info">
+  <b>Slab</b> 286 × 88 × 13<br>
+  <b>Window</b> 286 wide, 245 tall<br>
+  <b>Current steps</b> 10 × (10 rise, 30.5 going), 92 wide, 44 from right edge looking out<br>
+  <b>New steps</b> 7 × (15.7 rise, 28 going)<br>
+  <hr>
+  One finger drag to orbit, pinch to zoom, two fingers to pan. On a computer: drag, scroll, right-drag.
+</div>
+<div class="bottom">
+  <div class="stepper">
+    <button class="arrow" id="prev" aria-label="Previous option">‹</button>
+    <div class="chips" id="chips" style="flex:1; padding:2px 0;">
+      <button data-o="0" class="bare on">Existing</button>
+      <span class="sep">Keep steps</span>
+      <button data-o="1" class="old">A</button>
+      <button data-o="2" class="old">B</button>
+      <button data-o="3" class="old">C</button>
+      <button data-o="4" class="old">D</button>
+      <span class="sep">New steps</span>
+      <button data-o="5" class="new">1</button>
+      <button data-o="6" class="new">2</button>
+      <button data-o="7" class="new">3</button>
+      <button data-o="8" class="new">4</button>
+      <button data-o="9" class="new">5</button>
+      <button data-o="10" class="new">6</button>
+    </div>
+    <button class="arrow" id="next" aria-label="Next option">›</button>
+  </div>
+  <div class="views">
+    <button data-v="garden" class="on">Garden</button>
+    <button data-v="slab">On slab</button>
+    <button data-v="above">Above</button>
+    <button data-v="side">Side</button>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  const W = 286, D = 88, T = 13;
+  const SW = 92, SG = 30.5, SR = 10, N = 10;
+  const RIGHT_GAP = 44;
+  const WIN_H = 245;
+  const GROUND = -(SR * (N + 1));
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xdfe7ec);
+  scene.fog = new THREE.Fog(0xdfe7ec, 900, 2200);
+
+  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 5, 5000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+  document.body.appendChild(renderer.domElement);
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x8fa06a, 0.75);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xfff4e0, 0.9);
+  sun.position.set(-300, 500, 500);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -600; sun.shadow.camera.right = 600;
+  sun.shadow.camera.top = 600; sun.shadow.camera.bottom = -600;
+  sun.shadow.camera.far = 2000;
+  scene.add(sun);
+
+  const concrete = new THREE.MeshStandardMaterial({ color: 0xb9b5aa, roughness: 0.95 });
+  const concreteDark = new THREE.MeshStandardMaterial({ color: 0x9a968c, roughness: 0.95 });
+  const render = new THREE.MeshStandardMaterial({ color: 0xe8e2d6, roughness: 0.9 });
+  const glass = new THREE.MeshStandardMaterial({ color: 0x7fb3d9, transparent: true, opacity: 0.35, roughness: 0.1, metalness: 0.1 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x2f3a40, roughness: 0.6 });
+  const grass = new THREE.MeshStandardMaterial({ color: 0x86a95a, roughness: 1 });
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0xc9a77a, roughness: 0.8 });
+
+  function box(w, h, d, mat, x, y, z, receive) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z);
+    m.castShadow = true; m.receiveShadow = receive !== false;
+    scene.add(m);
+    return m;
+  }
+
+  // Ground: garden in front, ground under house behind
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), grass);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.set(W / 2, GROUND, 400);
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // House wall around the window, window glass, frame
+  const WALL_T = 30, WALL_H = WIN_H + 60, WING = 120;
+  box(WING, WALL_H + 110, WALL_T, render, -WING / 2, (WALL_H + GROUND) / 2, -WALL_T / 2);
+  box(WING, WALL_H + 110, WALL_T, render, W + WING / 2, (WALL_H + GROUND) / 2, -WALL_T / 2);
+  box(W + 2 * WING, 60, WALL_T, render, W / 2, WIN_H + 30, -WALL_T / 2);
+  box(W + 2 * WING, -GROUND, WALL_T, render, W / 2, GROUND / 2, -WALL_T / 2);
+  box(W, WIN_H, 2, glass, W / 2, WIN_H / 2, -WALL_T / 2, false).castShadow = false;
+  const F = 6;
+  box(W, F, WALL_T, frameMat, W / 2, F / 2, -WALL_T / 2);
+  box(W, F, WALL_T, frameMat, W / 2, WIN_H - F / 2, -WALL_T / 2);
+  box(F, WIN_H, WALL_T, frameMat, F / 2, WIN_H / 2, -WALL_T / 2);
+  box(F, WIN_H, WALL_T, frameMat, W - F / 2, WIN_H / 2, -WALL_T / 2);
+  box(F, WIN_H, WALL_T, frameMat, W / 2, WIN_H / 2, -WALL_T / 2);
+  // Living room floor and back wall so the window has something behind it
+  box(W, 4, 400, floorMat, W / 2, -2, -WALL_T - 200);
+  box(W + 2 * WING, WALL_H, 20, new THREE.MeshStandardMaterial({ color: 0xf1ede6 }), W / 2, WALL_H / 2, -WALL_T - 400);
+
+  // Hedge along the left-hand side (looking out), roughly 1.2 m tall
+  const hedgeMat = new THREE.MeshStandardMaterial({ color: 0x4f7a3a, roughness: 1 });
+  const hedge = box(50, 120, 600, hedgeMat, W + 45, GROUND + 60, 300);
+
+  // Slab and the plinth under it
+  box(W, T, D, concrete, W / 2, -T / 2, D / 2);
+  box(W, -GROUND - T, D, concreteDark, W / 2, (GROUND - T) / 2, D / 2);
+
+  // Facing the garden (+z) with y up, your right hand is toward x=0, so the 44 gap is at that end
+  const sx0 = RIGHT_GAP;
+  const oldSteps = new THREE.Group(); scene.add(oldSteps);
+  for (let i = 1; i <= N; i++) {
+    const top = -SR * i;
+    const h = top - GROUND;
+    const m = box(SW, h, SG, i % 2 ? concrete : concreteDark, sx0 + SW / 2, GROUND + h / 2, D + SG * (i - 0.5));
+    scene.remove(m); oldSteps.add(m);
+  }
+
+  // ---- Deck and storage options, in the 150 cm strip left of the steps (x 136..286) ----
+  const deckMat = new THREE.MeshStandardMaterial({ color: 0xb98b5e, roughness: 0.85 });
+  const deckLight = new THREE.MeshStandardMaterial({ color: 0xcfa273, roughness: 0.85 });
+  const cladMat = new THREE.MeshStandardMaterial({ color: 0x7d6246, roughness: 0.9 });
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0x6b5138, roughness: 0.9 });
+  const mowerMat = new THREE.MeshStandardMaterial({ color: 0x4f6b3a, roughness: 0.7 });
+  const wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+
+  const LX0 = sx0 + SW;            // left edge of steps = 136
+  const LW = W - LX0;              // 150
+  const LXC = LX0 + LW / 2;        // 211
+  const Z0 = D;                    // 88, front edge of slab
+
+  function gbox(g, w, h, d, mat, x, y, z) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true;
+    g.add(m); return m;
+  }
+  function mower(g, x, z, rotY) {
+    const mg = new THREE.Group();
+    gbox(mg, 55, 30, 60, mowerMat, 0, GROUND + 28, 0);
+    gbox(mg, 40, 4, 70, wheelMat, 0, GROUND + 58, -60);
+    const wheel = new THREE.CylinderGeometry(9, 9, 6, 16);
+    [[-30, 28], [30, 28], [-30, -28], [30, -28]].forEach(([wx, wz]) => {
+      const w = new THREE.Mesh(wheel, wheelMat); w.rotation.z = Math.PI / 2;
+      w.position.set(wx, GROUND + 9, wz); w.castShadow = true; mg.add(w);
+    });
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 90), wheelMat);
+    bar.position.set(0, GROUND + 62, -60); bar.rotation.x = 1.35; mg.add(bar);
+    mg.position.set(x, 0, z); mg.rotation.y = rotY; g.add(mg);
+  }
+  function doors(g, x, y, z, w, h) {
+    // pair of doors on the +x (left-hand, garden) face, facing outward
+    gbox(g, 2, h, w / 2 - 1, doorMat, x, y, z - w / 4);
+    gbox(g, 2, h, w / 2 - 1, doorMat, x, y, z + w / 4);
+    gbox(g, 2, 8, 1.5, wheelMat, x + 1.5, y, z - 6);
+    gbox(g, 2, 8, 1.5, wheelMat, x + 1.5, y, z + 6);
+  }
+  function slats(g, x, z0, z1, y0, y1, n) {
+    const step = (z1 - z0) / n;
+    for (let i = 0; i < n; i++) gbox(g, 3, y1 - y0, step * 0.55, cladMat, x, (y0 + y1) / 2, z0 + step * (i + 0.5));
+  }
+
+  const options = { 0: new THREE.Group() };
+  function doorsZ(g, z, w, h, xc) {
+    // pair of doors on a +z (garden-facing) face, standing on the ground
+    const yc = GROUND + 4 + h / 2;
+    gbox(g, w / 2 - 1, h, 2, doorMat, xc - w / 4, yc, z);
+    gbox(g, w / 2 - 1, h, 2, doorMat, xc + w / 4, yc, z);
+    gbox(g, 1.5, 8, 2, wheelMat, xc - 6, yc, z + 1.5);
+    gbox(g, 1.5, 8, 2, wheelMat, xc + 6, yc, z + 1.5);
+  }
+  function store(g, depth, topY) {
+    gbox(g, LW - 2, topY - GROUND, depth - 2, cladMat, LXC, (GROUND + topY) / 2, Z0 + depth / 2);
+    doorsZ(g, Z0 + depth, 120, topY - GROUND - 6, LXC);
+  }
+
+  // A: 150 x 150 deck at slab height, store under it, double doors facing the garden
+  {
+    const g = new THREE.Group();
+    gbox(g, LW, 4, 150, deckMat, LXC, -2, Z0 + 75);
+    store(g, 150, -4);
+    mower(g, LXC, Z0 + 80, 0);
+    options[1] = g;
+  }
+
+  // B: same deck, store runs 60 further out; the extra bit is a planter at 20 below deck
+  {
+    const g = new THREE.Group();
+    gbox(g, LW, 4, 150, deckMat, LXC, -2, Z0 + 75);
+    gbox(g, LW - 2, -GROUND - 4, 208, cladMat, LXC, (GROUND - 4) / 2, Z0 + 105);
+    doorsZ(g, Z0 + 210, 120, -GROUND - 10, LXC);
+    // planter box on the extension, soil and a few plants
+    gbox(g, LW - 2, 24, 58, cladMat, LXC, 8, Z0 + 180);
+    gbox(g, LW - 10, 2, 50, new THREE.MeshStandardMaterial({ color: 0x4a3a2a }), LXC, 20, Z0 + 180);
+    const leaf = new THREE.MeshStandardMaterial({ color: 0x6f9a4f, roughness: 1 });
+    [-50, -15, 20, 55].forEach((dx, i) => {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(16 + (i % 2) * 6, 12, 10), leaf);
+      p.position.set(LXC + dx, 34 + (i % 2) * 6, Z0 + 180); p.castShadow = true; g.add(p);
+    });
+    mower(g, LXC, Z0 + 120, 0);
+    options[2] = g;
+  }
+
+  // C: full-length 150 x 300 deck, store under it, doors at the far end facing the garden
+  {
+    const g = new THREE.Group();
+    gbox(g, LW, 4, 300, deckMat, LXC, -2, Z0 + 150);
+    store(g, 300, -4);
+    mower(g, LXC, Z0 + 230, 0);
+    options[3] = g;
+  }
+
+  // D: 150 x 150 deck, then a lower flat-roofed store beyond it, roof 30 below deck, doors at the end
+  {
+    const g = new THREE.Group();
+    gbox(g, LW, 4, 150, deckMat, LXC, -2, Z0 + 75);
+    gbox(g, LW - 2, -GROUND - 4, 148, cladMat, LXC, (GROUND - 4) / 2, Z0 + 75);
+    gbox(g, LW - 2, -GROUND - 34, 168, cladMat, LXC, (GROUND - 34) / 2, Z0 + 150 + 85);
+    gbox(g, LW + 4, 4, 174, deckMat, LXC, -32, Z0 + 150 + 85);
+    doorsZ(g, Z0 + 320, 120, -GROUND - 40, LXC);
+    mower(g, LXC, Z0 + 250, 0);
+    options[4] = g;
+  }
+
+  // ---- Options with the old steps removed: new 7-riser flights (15.7 rise, 28 going) ----
+  const RISE = -GROUND / 7, GO = 28;
+  function stepBlock(g, x0, x1, z0, z1, top) {
+    const h = top - GROUND;
+    gbox(g, x1 - x0, h, z1 - z0, ((x0 + z0) | 0) % 2 ? concrete : concreteDark, (x0 + x1) / 2, GROUND + h / 2, (z0 + z1) / 2);
+  }
+  function flightOut(g, x0, w, z) {           // straight out into the garden
+    for (let i = 1; i <= 6; i++) stepBlock(g, x0, x0 + w, z + GO * (i - 1), z + GO * i, -RISE * i);
+  }
+  function flightAlong(g, xTop, z, w) {       // along the front face, descending toward x = 0
+    for (let i = 1; i <= 6; i++) stepBlock(g, xTop - GO * i, xTop - GO * (i - 1), z, z + w, -RISE * i);
+  }
+  function fullDeck(g, depth) {
+    gbox(g, W, 4, depth, deckMat, W / 2, -2, Z0 + depth / 2);
+    gbox(g, W - 2, -GROUND - 4, depth - 2, cladMat, W / 2, (GROUND - 4) / 2, Z0 + depth / 2);
+  }
+
+  // 1: full-width deck 180 deep, doors on the left part of the front, flight along the front on the right
+  {
+    const g = new THREE.Group();
+    fullDeck(g, 180);
+    doorsZ(g, Z0 + 180, 110, -GROUND - 10, 228);
+    flightAlong(g, 168, Z0 + 180, 92);
+    mower(g, 228, Z0 + 120, 0);
+    options[5] = g;
+  }
+  // 2: full-width deck 180 deep, central 110-wide flight, a store each side
+  {
+    const g = new THREE.Group();
+    fullDeck(g, 180);
+    flightOut(g, 88, 110, Z0 + 180);
+    doorsZ(g, Z0 + 180, 70, -GROUND - 10, 44);
+    doorsZ(g, Z0 + 180, 70, -GROUND - 10, 242);
+    mower(g, 242, Z0 + 120, 0);
+    options[6] = g;
+  }
+  // 3: upper terrace 120 deep; on the left a store bay carries the upper deck out to 200;
+  //    two broad steps down to a lower terrace at -50 on the right 190; three risers to the garden
+  {
+    const g = new THREE.Group();
+    fullDeck(g, 120);
+    // store bay, x 190..286, z 208..288, deck on top, doors at the front
+    gbox(g, 96, 4, 80, deckMat, 238, -2, Z0 + 160);
+    gbox(g, 94, -GROUND - 4, 78, cladMat, 238, (GROUND - 4) / 2, Z0 + 160);
+    doorsZ(g, Z0 + 200, 80, -GROUND - 10, 238);
+    // broad steps, x 0..190
+    stepBlock(g, 0, 190, Z0 + 120, Z0 + 160, -25);
+    stepBlock(g, 0, 190, Z0 + 160, Z0 + 200, -50);
+    // lower terrace at -50, 130 deep, full width beyond the store bay
+    gbox(g, W, 4, 130, deckMat, W / 2, -52, Z0 + 265);
+    gbox(g, W - 2, -GROUND - 54, 128, cladMat, W / 2, (GROUND - 54) / 2, Z0 + 265);
+    // three risers to the garden, full width
+    stepBlock(g, 0, W, Z0 + 330, Z0 + 360, -70);
+    stepBlock(g, 0, W, Z0 + 360, Z0 + 390, -90);
+    // a chair on the lower terrace
+    gbox(g, 45, 4, 45, deckLight, 90, -72, Z0 + 270);
+    gbox(g, 45, 40, 4, deckLight, 90, -72, Z0 + 250);
+    mower(g, 238, Z0 + 140, 0);
+    options[7] = g;
+  }
+  // 4: full deck 180 deep, nested corner steps at the right-hand front corner, doors to the left of them
+  {
+    const g = new THREE.Group();
+    fullDeck(g, 180);
+    for (let i = 1; i <= 6; i++) {
+      const S = 20 + 26 * i;
+      stepBlock(g, 0, S, Z0 + 180, Z0 + 180 + S, -RISE * i);
+    }
+    doorsZ(g, Z0 + 180, 100, -GROUND - 10, 232);
+    mower(g, 232, Z0 + 120, 0);
+    options[8] = g;
+  }
+  // 5: narrow deck 120 deep, wide store with two pairs of doors, compact flight on the right
+  {
+    const g = new THREE.Group();
+    fullDeck(g, 120);
+    flightOut(g, 0, 92, Z0 + 120);
+    doorsZ(g, Z0 + 120, 80, -GROUND - 10, 140);
+    doorsZ(g, Z0 + 120, 80, -GROUND - 10, 236);
+    mower(g, 236, Z0 + 60, 0);
+    options[9] = g;
+  }
+  // 6: as 5, but the flight on the left beside the hedge
+  {
+    const g = new THREE.Group();
+    fullDeck(g, 120);
+    flightOut(g, W - 92, 92, Z0 + 120);
+    doorsZ(g, Z0 + 120, 80, -GROUND - 10, 50);
+    doorsZ(g, Z0 + 120, 80, -GROUND - 10, 146);
+    mower(g, 146, Z0 + 60, 0);
+    options[10] = g;
+  }
+
+  Object.values(options).forEach(g => { g.visible = false; scene.add(g); });
+  options[0].visible = true;
+
+  const optInfo = {
+    0: ['Existing porch', 'Slab, window and the current 10 shallow steps.'],
+    1: ['A · Short deck, front doors', '150 × 150 deck at slab height, store below with doors facing the garden.'],
+    2: ['B · Short deck + planter', 'Store runs 60 further out for mower room, topped by a planter.'],
+    3: ['C · Long deck, end doors', 'Full 150 × 300 deck, long store with doors at the far end.'],
+    4: ['D · Deck + low flat-roof store', 'Short deck, then a lower flat-roofed store 30 below deck.'],
+    5: ['1 · Full deck, steps on right', '286 × 180 deck, store under, flight runs along the front.'],
+    6: ['2 · Full deck, central flight', '286 × 180 deck, flight straight out, a store each side.'],
+    7: ['3 · Two terraces', 'Upper deck, broad steps to a lower terrace, then to the garden.'],
+    8: ['4 · Deck, corner steps', 'Full deck with nested corner steps on the right.'],
+    9: ['5 · Narrow deck, right flight', '286 × 120 deck, wide store, compact flight on the right.'],
+    10: ['6 · Narrow deck, left flight', 'As 5, with the flight on the hedge side.'],
+  };
+  const chipBtns = [...document.querySelectorAll('#chips button')];
+  let current = 0;
+  function selectOption(n) {
+    current = n;
+    chipBtns.forEach(x => x.classList.toggle('on', Number(x.dataset.o) === n));
+    Object.entries(options).forEach(([k, g]) => { g.visible = Number(k) === n; });
+    oldSteps.visible = n < 5;
+    document.getElementById('optTitle').textContent = optInfo[n][0];
+    document.getElementById('optDesc').textContent = optInfo[n][1];
+    const b = chipBtns.find(x => Number(x.dataset.o) === n);
+    if (b) b.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+  chipBtns.forEach(b => b.addEventListener('click', () => selectOption(Number(b.dataset.o))));
+  document.getElementById('prev').addEventListener('click', () => selectOption((current + 10) % 11));
+  document.getElementById('next').addEventListener('click', () => selectOption((current + 1) % 11));
+  const infoBtn = document.getElementById('infoBtn'), info = document.getElementById('info');
+  infoBtn.addEventListener('click', () => {
+    const open = info.classList.toggle('open');
+    infoBtn.setAttribute('aria-expanded', open);
+  });
+
+  // Camera controls (orbit + pan + zoom, pointer based)
+  const target = new THREE.Vector3(W / 2, -20, 110);
+  let theta = 0.55, phi = 1.15, radius = 700;
+  const views = {
+    garden: { theta: 0.55, phi: 1.15, radius: 700, target: [W / 2, -20, 110] },
+    slab:   { theta: Math.PI, phi: 1.35, radius: 160, target: [W / 2, -60, 220] },
+    above:  { theta: 0.0, phi: 0.05, radius: 700, target: [W / 2, -40, 150] },
+    side:   { theta: Math.PI / 2, phi: 1.3, radius: 650, target: [W / 2, 40, 150] },
+  };
+  function fit() {
+    const a = innerWidth / innerHeight;
+    return a < 1 ? Math.min(2.2, 0.8 / a) : 1;
+  }
+  let currentView = null;
+  function setView(v) {
+    currentView = v;
+    theta = v.theta; phi = v.phi; radius = v.radius * (v === views.slab ? 1 : fit()); target.set(...v.target);
+  }
+  function updateCamera() {
+    phi = Math.max(0.05, Math.min(1.55, phi));
+    radius = Math.max(60, Math.min(2500, radius));
+    camera.position.set(
+      target.x + radius * Math.sin(phi) * Math.sin(theta),
+      target.y + radius * Math.cos(phi),
+      target.z + radius * Math.sin(phi) * Math.cos(theta)
+    );
+    camera.lookAt(target);
+  }
+
+  const el = renderer.domElement;
+  const pointers = new Map();
+  let lastPinch = 0, lastMid = null;
+  el.addEventListener('pointerdown', e => { info.classList.remove('open'); infoBtn.setAttribute('aria-expanded', false); pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, b: e.button }); el.setPointerCapture(e.pointerId); });
+  el.addEventListener('pointerup', e => { pointers.delete(e.pointerId); lastPinch = 0; lastMid = null; });
+  el.addEventListener('pointercancel', e => { pointers.delete(e.pointerId); lastPinch = 0; lastMid = null; });
+  el.addEventListener('contextmenu', e => e.preventDefault());
+  el.addEventListener('pointermove', e => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    if (pointers.size === 1) {
+      if (p.b === 2 || e.shiftKey) pan(dx, dy); else { theta -= dx * 0.006; phi -= dy * 0.006; }
+    } else if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      if (lastPinch) radius *= lastPinch / dist;
+      if (lastMid) pan(mid.x - lastMid.x, mid.y - lastMid.y);
+      lastPinch = dist; lastMid = mid;
+    }
+  });
+  el.addEventListener('wheel', e => { e.preventDefault(); radius *= 1 + Math.sign(e.deltaY) * 0.1; }, { passive: false });
+  function pan(dx, dy) {
+    const k = radius * 0.0012;
+    const right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
+    const up = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
+    target.addScaledVector(right, -dx * k).addScaledVector(up, dy * k);
+  }
+
+  document.querySelectorAll('.views button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.views button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    setView(views[b.dataset.v]);
+  }));
+
+  addEventListener('resize', () => {
+    const before = fit();
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    if (currentView && currentView !== views.slab) radius *= fit() / before;
+  });
+
+  setView(views.garden);
+  (function loop() { updateCamera(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
+})();
+</script>
+</body>
+</html>
