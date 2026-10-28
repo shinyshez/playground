@@ -104,9 +104,9 @@ body{font-family:var(--mono);-webkit-user-select:none;user-select:none;-webkit-t
 
   <section class="overlay" id="title">
     <div class="logo">SKY<br>LANCE</div>
-    <div class="tag">The higher lance wins</div>
+    <div class="tag">Winged unicorns · long lances</div>
     <ul class="how">
-      <li><b>Tap left or right</b> to flap that way. Hold to steer.</li>
+      <li><b>Tap left or right</b> to beat your unicorn's wings that way. Hold to steer.</li>
       <li><b>Hit riders from above.</b> Lower at impact, you fall.</li>
       <li><b>Grab the eggs</b> before they hatch into something worse.</li>
     </ul>
@@ -645,31 +645,50 @@ function drawRider(b, mount, rider, alpha, ox, pennant) {
   ctx.globalAlpha = alpha;
   ctx.translate(b.x + ox, b.y); ctx.scale(b.face || 1, 1);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  // legs
-  ctx.strokeStyle = mount; ctx.lineWidth = 1.7; ctx.beginPath();
-  if (b.ground) { const s = Math.sin(b.legT) * 3.5 * Math.min(1, Math.abs(b.vx) / 30); ctx.moveTo(-2, 7); ctx.lineTo(-2 - s, 11); ctx.moveTo(3, 7); ctx.lineTo(3 + s, 11); }
-  else { ctx.moveTo(-1, 7); ctx.lineTo(-5, 10); ctx.moveTo(3, 7); ctx.lineTo(-1, 10.5); }
+  const now = performance.now() / 1000, dark = shade(mount);
+  // unicorn legs: gallop on the ground, tucked in flight
+  ctx.strokeStyle = mount; ctx.lineWidth = 1.8; ctx.beginPath();
+  if (b.ground) {
+    const s = Math.sin(b.legT) * 3.5 * Math.min(1, Math.abs(b.vx) / 30);
+    ctx.moveTo(-6, 6); ctx.lineTo(-6 - s, 12); ctx.moveTo(-3, 6); ctx.lineTo(-3 + s, 12);
+    ctx.moveTo(4, 6); ctx.lineTo(4 + s, 12); ctx.moveTo(7, 6); ctx.lineTo(7 - s, 12);
+  } else {
+    ctx.moveTo(-6, 6); ctx.lineTo(-10, 9); ctx.moveTo(-3, 6); ctx.lineTo(-7, 10);
+    ctx.moveTo(4, 6); ctx.lineTo(8, 9.5); ctx.moveTo(7, 5); ctx.lineTo(10.5, 8);
+  }
   ctx.stroke();
-  // mount
+  // flowing tail
+  const sway = Math.sin(now * 7 + b.x * .05) * 2;
+  ctx.strokeStyle = dark; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(-9, 0); ctx.quadraticCurveTo(-15, -2 + sway, -18, 5 + sway); ctx.stroke();
+  // body, neck, head
   ctx.fillStyle = mount;
-  ctx.beginPath(); ctx.moveTo(-8, 1); ctx.lineTo(-16, -4); ctx.lineTo(-11, 5); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(0, 3, 10, 6, 0, 0, TAU); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(9.5, -7); ctx.lineTo(12.5, -5); ctx.lineTo(9, 3); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.arc(11, -7, 3.3, 0, TAU); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(13.6, -8.2); ctx.lineTo(18.5, -6.4); ctx.lineTo(13.6, -5); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, 3, 10, 5.5, 0, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(4, 0); ctx.lineTo(9, -8); ctx.lineTo(13, -6); ctx.lineTo(9.5, 3); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(13, -7, 4.6, 2.8, .4, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(10, -9); ctx.lineTo(10.5, -12.5); ctx.lineTo(12, -9.5); ctx.closePath(); ctx.fill();
+  // mane
+  ctx.strokeStyle = dark; ctx.lineWidth = 2.4;
+  ctx.beginPath(); ctx.moveTo(9.5, -9); ctx.quadraticCurveTo(6 + sway * .3, -6, 4.5, 0); ctx.stroke();
+  // horn with a glint
+  ctx.fillStyle = C.shell;
+  ctx.beginPath(); ctx.moveTo(13, -9.6); ctx.lineTo(18.5, -16.5); ctx.lineTo(15.3, -8.6); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = alpha * (.5 + .5 * Math.sin(now * 5 + b.x));
+  ctx.fillStyle = C.ink; ctx.fillRect(18, -17.5, 1.6, 1.6);
+  ctx.globalAlpha = alpha;
   // rider
   ctx.fillStyle = rider;
-  ctx.fillRect(-3.2, -9, 6.4, 8);
-  ctx.beginPath(); ctx.arc(0, -12, 3.1, 0, TAU); ctx.fill();
+  ctx.fillRect(-3.2, -9.5, 6.4, 8);
+  ctx.beginPath(); ctx.arc(0, -12.5, 3.1, 0, TAU); ctx.fill();
   // lance
   ctx.strokeStyle = rider; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(-8, -3.5); ctx.lineTo(23, -7.5); ctx.stroke();
-  if (pennant) { ctx.fillStyle = C.gold; ctx.beginPath(); ctx.moveTo(15, -6.6); ctx.lineTo(10, -12 + Math.sin(performance.now() / 90) * 1.2); ctx.lineTo(9, -5.8); ctx.closePath(); ctx.fill(); }
+  ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(24, -4.5); ctx.stroke();
+  if (pennant) { ctx.fillStyle = C.gold; ctx.beginPath(); ctx.moveTo(14, -4.3); ctx.lineTo(9, -9.5 + Math.sin(now * 11) * 1.2); ctx.lineTo(8, -4.2); ctx.closePath(); ctx.fill(); }
   // wing
   const ang = b.ground && !b.wing ? -.25 : -.95 * b.wing + .65 * (1 - b.wing);
   ctx.save(); ctx.translate(-1, 1); ctx.rotate(ang);
-  ctx.fillStyle = shade(mount);
-  ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(-14, -2); ctx.lineTo(-5, 5); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = dark;
+  ctx.beginPath(); ctx.moveTo(2, 0); ctx.quadraticCurveTo(-8, -6, -15, -3); ctx.lineTo(-10, 1); ctx.lineTo(-12, 3); ctx.lineTo(-5, 5); ctx.closePath(); ctx.fill();
   ctx.restore();
   ctx.restore();
 }
