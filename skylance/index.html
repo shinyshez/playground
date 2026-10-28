@@ -22,6 +22,7 @@
   --lava:#ff7a3d;
   --lava-deep:#b8321e;
   --shell:#f6efe0;
+  --rainbow:linear-gradient(90deg,#ff5d7a,#ffb35c,#ffe66b,#5ff0c0,#5ec8ff,#b48cff);
   --display:"Bungee","Arial Black",Impact,system-ui,sans-serif;
   --mono:"DM Mono",ui-monospace,Menlo,Consolas,monospace;
   color-scheme:dark;
@@ -38,7 +39,10 @@ body{font-family:var(--mono);-webkit-user-select:none;user-select:none;-webkit-t
   display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;pointer-events:none}
 #score{font-family:var(--display);font-size:22px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .hud-l{position:relative}
-#combo{position:absolute;left:0;top:100%;margin-top:3px;white-space:nowrap;font-family:var(--display);font-size:12px;color:var(--gold);letter-spacing:.06em}
+#meter{position:absolute;left:0;top:100%;margin-top:4px;width:76px;height:4px;background:var(--ledge);overflow:hidden}
+#meterFill{height:100%;width:0;background:var(--rainbow);transition:width .2s}
+#meter.on #meterFill{animation:pulse .35s ease-in-out infinite}
+#combo{position:absolute;left:0;top:100%;margin-top:12px;white-space:nowrap;font-family:var(--display);font-size:12px;color:var(--gold);letter-spacing:.06em}
 .hud-c{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);text-align:center}
 .hud-c b{font-family:var(--display);font-weight:400;font-size:18px;color:var(--ink);letter-spacing:.04em;margin-left:6px}
 .hud-r{display:flex;justify-content:flex-end;align-items:center;gap:6px}
@@ -86,7 +90,7 @@ body{font-family:var(--mono);-webkit-user-select:none;user-select:none;-webkit-t
   <canvas id="c" aria-label="Skylance arena"></canvas>
 
   <header id="hud">
-    <div class="hud-l"><div id="score">0</div><div id="combo"></div></div>
+    <div class="hud-l"><div id="score">0</div><div id="meter" aria-label="Rainbow meter"><div id="meterFill"></div></div><div id="combo"></div></div>
     <div class="hud-c">Wave<b id="wave">1</b></div>
     <div class="hud-r">
       <div id="lives" aria-label="Lives"></div>
@@ -109,6 +113,7 @@ body{font-family:var(--mono);-webkit-user-select:none;user-select:none;-webkit-t
       <li><b>Tap left or right</b> to beat your unicorn's wings that way. Hold to steer.</li>
       <li><b>Hit riders from above.</b> Lower at impact, you fall.</li>
       <li><b>Grab the eggs</b> before they hatch into something worse.</li>
+      <li><b>Fill the rainbow</b> to trail bubbles. Bubbled riders pop from any angle.</li>
     </ul>
     <button class="cta" id="btnPlay"><span>Ride</span></button>
     <div class="small" id="titleBest"></div>
@@ -231,6 +236,9 @@ const sfx = {
   escape: () => tone(300, 900, .15, 'square', .08),
   sizzle: () => noise(.25, .1, 3200),
   life: () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, f, .1, 'triangle', .1, i * .07)),
+  rainbow: () => [523, 587, 659, 784, 880, 1047].forEach((f, i) => tone(f, f * 1.5, .12, 'sine', .1, i * .05)),
+  bubble: () => tone(700, 1500, .06, 'sine', .1),
+  trap: () => { tone(400, 1200, .18, 'sine', .12); tone(600, 1800, .14, 'triangle', .05, .04); },
 };
 const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
 
@@ -239,6 +247,7 @@ let state = 'title', player = null, enemies = [], eggs = [], parts = [], pops = 
 let score = 0, best = 0, lives = 3, nextLife = 20000, wave = 0, waveT = 0, queue = [], spawnTimer = 0, clearT = null;
 let combo = 0, comboT = 0, eggStreak = 0, deathsThisWave = 0, tutFlaps = 0, pteroT = 99;
 let shake = 0, hitStop = 0, slow = 0, flash = 0, clankCd = 0;
+let rainbow = 0, rainbowT = 0, bubbleCd = 0, bubbles = [];
 const pointers = new Map(), keys = { l: 0, r: 0 };
 try { best = +localStorage.getItem('skylance.best') || 0; } catch (e) {}
 
@@ -293,12 +302,23 @@ function banner(t, s) {
 // ---------- HUD ----------
 let hudCache = '';
 function updateHud() {
-  const k = score + '|' + wave + '|' + lives + '|' + combo;
+  const fill = rainbowT > 0 ? rainbowT / 6 : rainbow;
+  const k = score + '|' + wave + '|' + lives + '|' + combo + '|' + Math.round(fill * 50) + (rainbowT > 0);
   if (k === hudCache) return; hudCache = k;
+  $('meterFill').style.width = (fill * 100).toFixed(1) + '%';
+  $('meter').classList.toggle('on', rainbowT > 0);
   $('score').textContent = score.toLocaleString();
   $('wave').textContent = Math.max(1, wave);
   $('lives').textContent = '◆'.repeat(Math.max(0, Math.min(lives, 9)));
   $('combo').textContent = combo > 1 ? `Chain ×${Math.min(combo, 8)}` : '';
+}
+function chargeRainbow(v) {
+  if (rainbowT > 0 || state !== 'play') return;
+  rainbow = Math.min(1, rainbow + v);
+  if (rainbow >= 1) {
+    rainbow = 0; rainbowT = 6; bubbleCd = 0;
+    banner('Rainbow!', 'Lure riders into your bubbles'); sfx.rainbow(); vib([20, 30, 20]);
+  }
 }
 function addScore(n) {
   score += n;
@@ -310,6 +330,7 @@ function startGame() {
   ensureAudio();
   state = 'play'; score = 0; lives = 3; nextLife = 20000; combo = 0; comboT = 0; eggStreak = 0; tutFlaps = 0;
   enemies = []; eggs = []; parts = []; pops = []; ptero = null; clearT = null;
+  rainbow = 0; rainbowT = 0; bubbles = [];
   spawnPlayer(); startWave(1);
   $('title').hidden = true; $('over').hidden = true; $('paused').hidden = true;
   hudCache = ''; updateHud();
@@ -450,6 +471,7 @@ function update(dt) {
     } else updatePlayer(dt);
   }
 
+  updateBubbles(dt);
   for (const e of enemies) updateEnemy(e, dt);
   enemies = enemies.filter(e => e.alive);
   for (const g of eggs) updateEgg(g, dt);
@@ -507,11 +529,57 @@ function updatePlayer(dt) {
   }
 }
 
+// rainbow trail: bubbles stream off the unicorn's tail and trap whatever flies into them
+function updateBubbles(dt) {
+  const p = player && !player.dead && !player.grab ? player : null;
+  if (rainbowT > 0) {
+    rainbowT -= dt;
+    if (!p || state !== 'play') rainbowT = 0;
+    bubbleCd -= dt;
+    if (p && bubbleCd <= 0) {
+      bubbleCd = .055;
+      bubbles.push({ x: p.x - p.face * 15, y: p.y + rand(-3, 5), vx: -p.face * rand(5, 25), vy: rand(-25, -8),
+        r: rand(4, 7), t: 0, life: rand(2.2, 3), hue: (performance.now() / 5) % 360 });
+    }
+  }
+  for (const b of bubbles) {
+    b.t += dt; b.x = ((b.x + b.vx * dt) % W + W) % W; b.y += b.vy * dt; b.vx *= 1 - dt;
+    b.x += Math.sin(b.t * 4 + b.hue) * 6 * dt;
+    if (b.t >= b.life) { b.dead = true; burst(b.x, b.y, `hsl(${b.hue},100%,75%)`, 3, 40); continue; }
+    for (const e of enemies) {
+      if (b.dead || !e.alive || e.spawnT > 0 || e.trapped > 0) continue;
+      const dx = wrapD(e.x - b.x), dy = e.y - b.y, R = e.r + b.r;
+      if (dx * dx + dy * dy < R * R) trapEnemy(e, b);
+    }
+    if (!b.dead && ptero && !(ptero.trapped > 0)) {
+      const dx = wrapD(ptero.x - b.x), dy = ptero.y - b.y;
+      if (dx * dx + dy * dy < 18 * 18) trapEnemy(ptero, b);
+    }
+  }
+  bubbles = bubbles.filter(b => !b.dead);
+}
+function trapEnemy(e, b) {
+  b.dead = true;
+  e.trapped = 4; e.vy = 0;
+  sfx.trap(); vib(12);
+  burst(e.x, e.y, `hsl(${b.hue},100%,72%)`, 10, 90);
+  pop(e.x, e.y - 22, 'BUBBLED', `hsl(${b.hue},100%,75%)`, 12);
+}
+function floatTrapped(e, dt) {
+  e.trapped -= dt;
+  e.vx *= 1 - 2 * dt; e.vy = -22;
+  e.x = ((e.x + e.vx * dt) % W + W) % W;
+  e.y = Math.max(24, e.y + e.vy * dt);
+  e.wing = Math.max(0, e.wing - dt * 3.5);
+  if (e.trapped <= 0) { e.trapped = 0; sfx.bubble(); burst(e.x, e.y, C.ink, 8, 80); }
+}
+
 function joust(e) {
   const p = player;
   const dx = wrapD(e.x - p.x), dy = e.y - p.y, R = p.r + e.r - 2;
   if (dx * dx + dy * dy > R * R) return;
-  if (dy > 4) killEnemy(e);
+  if (e.trapped > 0) killEnemy(e, true);
+  else if (dy > 4) killEnemy(e);
   else if (dy < -4 && p.inv <= 0) killPlayer('TOO LOW');
   else {
     const s = Math.sign(dx) || 1, ov = (R - Math.hypot(dx, dy)) / 2 + .5;
@@ -526,13 +594,16 @@ function joust(e) {
   }
 }
 
-function killEnemy(e) {
+function killEnemy(e, popped) {
   const T = TYPES[e.kind], p = player;
   e.alive = false;
   combo = comboT > 0 ? combo + 1 : 1; comboT = 2.5;
-  const mult = Math.min(combo, 8), pts = T.pts * mult;
+  const mult = Math.min(combo, 8), pts = T.pts * mult * (popped ? 2 : 1);
   addScore(pts);
-  pop(e.x, e.y - 18, mult > 1 ? `${pts.toLocaleString()} ×${mult}` : pts.toLocaleString(), T.color, mult > 1 ? 15 : 13);
+  const label = (popped ? 'POP! ' : '') + pts.toLocaleString() + (mult > 1 ? ` ×${mult}` : '');
+  pop(e.x, e.y - 18, label, T.color, mult > 1 || popped ? 15 : 13);
+  if (popped) { sfx.bubble(); for (let i = 0; i < 6; i++) burst(e.x, e.y, `hsl(${i * 60},100%,72%)`, 3, 150); }
+  chargeRainbow(.3);
   eggs.push({ x: e.x, y: e.y, px: e.x, py: e.y, vx: e.vx * .4 + p.vx * .25, vy: -170, r: 6, kind: e.kind, t: Math.max(4, 8 - wave * .3), ground: false, egg: true, dead: false });
   burst(e.x, e.y, T.color, 20); burst(e.x, e.y, C.ink, 6, 90);
   shake = Math.max(shake, 6 + mult); hitStop = .055; sfx.kill(); vib(18);
@@ -543,7 +614,7 @@ function killPlayer(reason) {
   const p = player;
   if (!p || p.dead) return;
   p.dead = true; p.grab = null; p.respawn = 1.5;
-  lives--; deathsThisWave++; combo = 0; comboT = 0; eggStreak = 0;
+  lives--; deathsThisWave++; combo = 0; comboT = 0; eggStreak = 0; rainbowT = 0;
   burst(p.x, p.y, C.gold, 28, 200); burst(p.x, p.y, C.ink, 10, 120);
   shake = 13; flash = .45; hitStop = .09; sfx.death(); vib([40, 40, 90]);
   pop(p.x, p.y - 24, reason, C.rose, 15);
@@ -557,6 +628,7 @@ function collectEgg(g) {
   addScore(pts);
   pop(g.x, g.y - 14, air ? `AIR CATCH ${pts}` : String(pts), air ? C.mint : C.shell, air ? 14 : 12);
   burst(g.x, g.y, C.shell, 8, 90); sfx.egg(eggStreak); vib(10);
+  chargeRainbow(air ? .25 : .12);
 }
 
 function updateEgg(g, dt) {
@@ -577,6 +649,7 @@ function updateEgg(g, dt) {
 function updateEnemy(e, dt) {
   e.wing = Math.max(0, e.wing - dt * 3.5);
   if (e.spawnT > 0) { e.spawnT -= dt; return; }
+  if (e.trapped > 0) { floatTrapped(e, dt); return; }
   const T = TYPES[e.kind], a = e.ai, sp = 1 + Math.min(.4, wave * .03);
   a.t -= dt; e.flapCd -= dt;
   const target = state === 'play' && player && !player.dead ? player : null;
@@ -615,6 +688,20 @@ function spawnPtero() {
 function updatePtero(dt) {
   const q = ptero; q.t += dt; q.turnT -= dt;
   const live = player && !player.dead ? player : null;
+  if (q.trapped > 0) {
+    floatTrapped(q, dt);
+    if (live) {
+      const dx = wrapD(q.x - live.x), dy = q.y - live.y;
+      if (dx * dx + dy * dy < 22 * 22) {
+        addScore(2000); pop(q.x, q.y - 20, 'POP! PTERROR 2,000', C.lava, 15);
+        burst(q.x, q.y, C.lava, 30, 220); for (let i = 0; i < 6; i++) burst(q.x, q.y, `hsl(${i * 60},100%,72%)`, 3, 160);
+        shake = 12; hitStop = .1; sfx.bubble(); sfx.kill(); vib(40);
+        ptero = null; pteroT = waveT + 14;
+      }
+    }
+    return;
+  }
+  if (Math.abs(q.vx) < 235) q.vx = (Math.sign(q.vx) || 1) * 235;
   const ty = live ? live.y : H * .4;
   q.y += clamp(ty - q.y, -1, 1) * Math.min(120, Math.abs(ty - q.y) * 2) * dt + Math.sin(q.t * 6) * 40 * dt;
   q.y = clamp(q.y, 20, lavaY - 50);
@@ -692,6 +779,22 @@ function drawRider(b, mount, rider, alpha, ox, pennant) {
   ctx.restore();
   ctx.restore();
 }
+function drawBubble(x, y, r, hue, lw, spectrum) {
+  ctx.fillStyle = `hsla(${hue},100%,72%,.14)`;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+  ctx.lineWidth = lw;
+  if (spectrum) {
+    for (let i = 0; i < 6; i++) {
+      ctx.strokeStyle = `hsl(${(hue + i * 60) % 360},100%,72%)`;
+      ctx.beginPath(); ctx.arc(x, y, r, i * TAU / 6, (i + 1) * TAU / 6 + .02); ctx.stroke();
+    }
+  } else {
+    ctx.strokeStyle = `hsl(${hue},100%,72%)`;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(255,255,255,.75)';
+  ctx.beginPath(); ctx.arc(x - r * .35, y - r * .4, Math.max(.8, r * .16), 0, TAU); ctx.fill();
+}
 function wrapped(x, m, fn) { fn(0); if (x < m) fn(W); if (x > W - m) fn(-W); }
 
 function drawPtero(q, ox) {
@@ -766,6 +869,20 @@ function render(now) {
     } else wrapped(e.x, 24, ox => drawRider(e, col, C.ink, 1, ox));
   }
   if (ptero) wrapped(ptero.x, 24, ox => drawPtero(ptero, ox));
+
+  // rainbow bubbles: trail, then the big ones holding trapped riders
+  for (const b of bubbles) {
+    const k = b.t / b.life, r = b.r * (.6 + .4 * Math.min(1, b.t * 6));
+    ctx.globalAlpha = k > .8 ? (1 - k) * 5 : 1;
+    wrapped(b.x, 10, ox => drawBubble(b.x + ox, b.y, r, b.hue, 1.2));
+  }
+  ctx.globalAlpha = 1;
+  for (const e of [...enemies, ptero]) {
+    if (!e || !(e.trapped > 0)) continue;
+    if (e.trapped < 1 && Math.floor(t * 14) % 2) continue;
+    const wob = Math.sin(t * 5 + e.x) * 1.2;
+    wrapped(e.x, 24, ox => drawBubble(e.x + ox, e.y - 1, 19 + wob, (t * 120) % 360, 2, true));
+  }
 
   // player
   if (player && !player.dead) {
