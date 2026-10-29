@@ -5,6 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=DM+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous" referrerpolicy="no-referrer" async></script>
 <style>
 /* Layout: one full-bleed canvas arena; HUD rides the top safe edge, overlays sit over a live attract-mode sky. Single dark look by design. */
 :root{
@@ -22,6 +23,8 @@
   --lava:#ff7a3d;
   --lava-deep:#b8321e;
   --shell:#f6efe0;
+  --bar:#07060d;
+  --cap-veil:rgba(7,6,13,.7);
   --rainbow:linear-gradient(90deg,#ff5d7a,#ffb35c,#ffe66b,#5ff0c0,#5ec8ff,#b48cff);
   --display:"Bungee","Arial Black",Impact,system-ui,sans-serif;
   --mono:"DM Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -82,6 +85,23 @@ body{font-family:var(--mono);-webkit-user-select:none;user-select:none;-webkit-t
 .big{font-family:var(--display);font-size:clamp(40px,13vw,72px);line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
 .over-t{font-family:var(--display);font-size:clamp(30px,10vw,52px);color:var(--rose);line-height:1;text-shadow:0 4px 0 var(--night)}
 .newbest{font-family:var(--display);font-size:14px;color:var(--night);background:var(--mint);padding:4px 10px;letter-spacing:.08em}
+#cut{position:absolute;inset:0;opacity:0;transition:opacity .25s ease;background:var(--night-2);touch-action:none;cursor:pointer}
+#cut.on{opacity:1}
+#cut3d{display:block;width:100%;height:100%}
+#cut .bar{position:absolute;left:0;right:0;height:0;background:var(--bar);transition:height .35s cubic-bezier(.2,.8,.2,1)}
+#cut .bar.top{top:0}
+#cut .bar.bot{bottom:0}
+#cut.on .bar{height:calc(11vh + env(safe-area-inset-top,0px))}
+#cut.on .bar.bot{height:calc(11vh + env(safe-area-inset-bottom,0px))}
+#cutFlash{position:absolute;inset:0;background:var(--ink);opacity:0;pointer-events:none}
+#cutFlash.go{animation:cutflash .45s ease-out}
+@keyframes cutflash{0%{opacity:.85}100%{opacity:0}}
+#cutCap{position:absolute;left:0;right:0;bottom:calc(11vh + env(safe-area-inset-bottom,0px));padding-block:40px 18px;background:linear-gradient(180deg,transparent,var(--cap-veil));text-align:center;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s;pointer-events:none;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#cutCap.show{opacity:1;transform:none}
+#cutT{font-family:var(--display);font-size:clamp(32px,10vw,64px);line-height:1;color:var(--gold);text-shadow:0 4px 0 var(--lava-deep);text-wrap:balance}
+#cutS{margin-top:8px;text-shadow:0 1px 3px var(--bar);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+#cutSkip{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 11vh - 26px);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);pointer-events:none}
 @media (prefers-reduced-motion:reduce){#hint span{animation:none}#banner.show{animation-duration:2.3s}}
 </style>
 
@@ -105,6 +125,14 @@ body{font-family:var(--mono);-webkit-user-select:none;user-select:none;-webkit-t
 
   <div id="hint" hidden><span>◀ Tap · flap left</span><span>Flap right · tap ▶</span></div>
   <div id="banner"><div id="bannerT"></div><div id="bannerS"></div></div>
+
+  <div id="cut" hidden aria-live="polite">
+    <canvas id="cut3d" aria-hidden="true"></canvas>
+    <div class="bar top"></div><div class="bar bot"></div>
+    <div id="cutFlash"></div>
+    <div id="cutCap"><div id="cutT"></div><div id="cutS"></div></div>
+    <div id="cutSkip">Tap to skip</div>
+  </div>
 
   <section class="overlay" id="title">
     <div class="logo">SKY<br>LANCE</div>
@@ -317,7 +345,8 @@ function chargeRainbow(v) {
   rainbow = Math.min(1, rainbow + v);
   if (rainbow >= 1) {
     rainbow = 0; rainbowT = 6; bubbleCd = 0;
-    banner('Rainbow!', 'Lure riders into your bubbles'); sfx.rainbow(); vib([20, 30, 20]);
+    if (!playCut('rainbow')) { banner('Rainbow!', 'Lure riders into your bubbles'); sfx.rainbow(); }
+    vib([20, 30, 20]);
   }
 }
 function addScore(n) {
@@ -334,6 +363,7 @@ function startGame() {
   spawnPlayer(); startWave(1);
   $('title').hidden = true; $('over').hidden = true; $('paused').hidden = true;
   hudCache = ''; updateHud();
+  setTimeout(initCut, 30);
   try { navigator.wakeLock && navigator.wakeLock.request('screen').catch(() => {}); } catch (e) {}
 }
 function spawnPlayer() {
@@ -372,7 +402,7 @@ function waveClear() {
   if (ptero) { burst(ptero.x, ptero.y, C.lava, 16); ptero = null; }
   let sub = '';
   if (deathsThisWave === 0 && wave > 1) { const b = 500 * wave; addScore(b); sub = `Flawless +${b.toLocaleString()}`; }
-  banner('Wave ' + wave + ' clear', sub);
+  if (wave % 5 || !playCut('milestone', { wave, sub }, null, true)) banner('Wave ' + wave + ' clear', sub);
 }
 function gameOver() {
   state = 'over';
@@ -426,6 +456,7 @@ addEventListener('keydown', e => {
   const k = e.code;
   if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'Space'].includes(k)) e.preventDefault();
   if (e.repeat) return;
+  if (cut.active) { if (k === 'Space' || k === 'Enter' || k === 'Escape') endCut(); return; }
   if (state === 'title' && (k === 'Space' || k === 'Enter')) { if (document.activeElement !== $('btnPlay')) startGame(); return; }
   if (state === 'over' && (k === 'Space' || k === 'Enter') && !$('btnAgain').disabled) { if (document.activeElement !== $('btnAgain')) startGame(); return; }
   if (k === 'KeyP' || k === 'Escape') { setPaused(state === 'play'); return; }
@@ -618,6 +649,7 @@ function killPlayer(reason) {
   burst(p.x, p.y, C.gold, 28, 200); burst(p.x, p.y, C.ink, 10, 120);
   shake = 13; flash = .45; hitStop = .09; sfx.death(); vib([40, 40, 90]);
   pop(p.x, p.y - 24, reason, C.rose, 15);
+  if (lives <= 0) { p.respawn = .6; playCut('gameover', { wave }, null, true); }
 }
 
 function collectEgg(g) {
@@ -682,7 +714,7 @@ function spawnPtero() {
   const dir = Math.random() < .5 ? -1 : 1;
   ptero = { x: ((px + W / 2) % W + W) % W, y: H * rand(.15, .4), vx: dir * 235, t: 0, turnT: 3, wing: 0 };
   sfx.ptero(); vib(30);
-  banner('Pterror', 'Lance it head-on');
+  if (!playCut('pterror', {}, null, true)) banner('Pterror', 'Lance it head-on');
   pteroT = waveT + 999;
 }
 function updatePtero(dt) {
@@ -697,6 +729,7 @@ function updatePtero(dt) {
         burst(q.x, q.y, C.lava, 30, 220); for (let i = 0; i < 6; i++) burst(q.x, q.y, `hsl(${i * 60},100%,72%)`, 3, 160);
         shake = 12; hitStop = .1; sfx.bubble(); sfx.kill(); vib(40);
         ptero = null; pteroT = waveT + 14;
+        playCut('slain', { pts: 2000 }, null, true);
       }
     }
     return;
@@ -715,6 +748,7 @@ function updatePtero(dt) {
       addScore(1000); pop(q.x, q.y - 20, 'PTERROR 1,000', C.lava, 15);
       burst(q.x, q.y, C.lava, 30, 220); shake = 12; hitStop = .1; sfx.kill(); vib(40);
       ptero = null; pteroT = waveT + 14;
+      playCut('slain', { pts: 1000 }, null, true);
     } else if (live.inv <= 0) killPlayer('PTERRORIZED');
   }
 }
@@ -925,10 +959,326 @@ function render(now) {
   }
 }
 
+// ---------- cut scenes (three.js) ----------
+// Dramatic moments freeze the arena and cut to a short 3D shot. Tap skips. If three.js
+// or WebGL is unavailable, or reduced motion is on, callers fall back to the 2D banner.
+const cut = { k: 1, r: null, scene: null, cam: null, active: null, lastEnd: -1e9, failed: false, shake: 0, fx: [], bubbles: [] };
+const CUT_GAP = 9000;
+let A = null; // 3D actors
+
+function initCut() {
+  if (cut.r) return true;
+  if (cut.failed || reduceMotion || !window.THREE) return false;
+  try {
+    const T = window.THREE;
+    const r = new T.WebGLRenderer({ canvas: $('cut3d'), antialias: true, powerPreference: 'high-performance' });
+    r.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    const scene = new T.Scene();
+    scene.background = new T.Color(C.night2);
+    scene.fog = new T.Fog(C.night2, 16, 62);
+    const cam = new T.PerspectiveCamera(50, 1, .1, 200);
+    scene.add(new T.HemisphereLight(0xc9bcff, 0x4a1c24, .8));
+    const key = new T.DirectionalLight(0xffffff, .75); key.position.set(4, 10, 7); scene.add(key);
+    const glow = new T.PointLight(C.lava, 1.3, 40, 2); glow.position.set(0, -6, 2); scene.add(glow);
+    Object.assign(cut, { r, scene, cam, glow });
+    A = buildActors(T, scene);
+    sizeCut();
+    r.compile(scene, cam);
+    return true;
+  } catch (e) { cut.failed = true; cut.r = null; return false; }
+}
+function sizeCut() {
+  if (!cut.r) return;
+  cut.r.setSize(innerWidth, innerHeight, false);
+  const a = innerWidth / innerHeight;
+  cut.k = a < 1 ? 1.25 + (1 - a) * .9 : 1;
+  cut.cam.aspect = a; cut.cam.fov = a < 1 ? 64 : 48; cut.cam.updateProjectionMatrix();
+}
+addEventListener('resize', sizeCut);
+
+const mat = (T, col, o) => new T.MeshStandardMaterial(Object.assign({ color: col, flatShading: true, roughness: .7, metalness: 0 }, o || {}));
+function mesh(T, geo, m, parent, x, y, z, rz = 0, sx = 1, sy = 1, sz = 1) {
+  const o = new T.Mesh(geo, m); o.position.set(x, y, z); o.rotation.z = rz; o.scale.set(sx, sy, sz); parent.add(o); return o;
+}
+function wingPair(T, parent, shape, m, x, y, z) {
+  const geo = new T.ShapeGeometry(shape);
+  return [1, -1].map(s => {
+    const p = new T.Group(); p.position.set(x, y, z * s);
+    const w = new T.Mesh(geo, m); w.rotation.x = s * Math.PI / 2; p.add(w); parent.add(p);
+    return { p, s };
+  });
+}
+function flapWings(u, t, speed, amp, base) { for (const w of u.wings) w.p.rotation.x = -w.s * (base + Math.sin(t * speed) * amp); }
+function faceDir(g, dx, dz) { g.rotation.y = Math.atan2(-dz, dx); }
+
+function makeUnicorn(T, col, riderCol, pennant) {
+  const g = new T.Group(), m = mat(T, col), d = mat(T, shade(col)), rm = mat(T, riderCol);
+  mesh(T, new T.SphereGeometry(1, 14, 10), m, g, 0, 0, 0, 0, 1.3, .7, .62);
+  mesh(T, new T.CylinderGeometry(.26, .4, 1.2, 8), m, g, 1.05, .62, 0, -.6);
+  mesh(T, new T.SphereGeometry(.42, 10, 8), m, g, 1.62, 1.15, 0, -.35, 1.5, .78, .8);
+  mesh(T, new T.BoxGeometry(.2, 1.15, .18), d, g, .8, .8, 0, -.6);
+  for (const z of [.13, -.13]) mesh(T, new T.ConeGeometry(.08, .28, 4), m, g, 1.36, 1.5, z, -.2);
+  mesh(T, new T.ConeGeometry(.09, 1.05, 8), mat(T, C.shell, { emissive: C.shell, emissiveIntensity: .55 }), g, 1.86, 1.74, 0, -.65);
+  mesh(T, new T.ConeGeometry(.26, 1.4, 8), d, g, -1.55, .05, 0, 1.95);
+  const legs = [[.75, .3], [.75, -.3], [-.7, .3], [-.7, -.3]].map(([x, z]) => {
+    const p = new T.Group(); p.position.set(x, -.25, z);
+    mesh(T, new T.CylinderGeometry(.1, .07, 1, 6), m, p, 0, -.5, 0); g.add(p); return p;
+  });
+  mesh(T, new T.BoxGeometry(.42, .72, .36), rm, g, -.1, .95, 0);
+  mesh(T, new T.SphereGeometry(.21, 10, 8), rm, g, -.1, 1.52, 0);
+  const lance = new T.Group(); lance.position.set(-.1, 1.0, .3); g.add(lance);
+  mesh(T, new T.ConeGeometry(.08, 3.4, 6), rm, lance, 1.4, 0, 0, -Math.PI / 2);
+  if (pennant) mesh(T, new T.BoxGeometry(.55, .28, .03), mat(T, C.gold, { emissive: C.gold, emissiveIntensity: .3 }), lance, .55, .2, 0);
+  const ws = new T.Shape(); ws.moveTo(0, 0); ws.lineTo(-.3, 1.9); ws.lineTo(-1.3, 1.5); ws.lineTo(-1, .6); ws.lineTo(-.6, .1);
+  const wings = wingPair(T, g, ws, mat(T, shade(col, .85), { side: T.DoubleSide }), .1, .45, .3);
+  return { g, wings, legs, lance };
+}
+function makePtero(T) {
+  const g = new T.Group(), m = mat(T, C.lava, { emissive: C.lavaDeep, emissiveIntensity: .45 }), d = mat(T, shade(C.lava, .7));
+  mesh(T, new T.ConeGeometry(.38, 3.2, 6), m, g, 0, 0, 0, -Math.PI / 2);
+  mesh(T, new T.ConeGeometry(.16, 1.2, 4), d, g, .9, .45, 0, 2.2);
+  const jawTop = mesh(T, new T.ConeGeometry(.11, 1.5, 4), m, g, 2.2, .1, 0, -Math.PI / 2 - .12);
+  const jawBot = mesh(T, new T.ConeGeometry(.09, 1.3, 4), m, g, 2.1, -.15, 0, -Math.PI / 2 + .25);
+  for (const z of [.2, -.2]) mesh(T, new T.SphereGeometry(.09, 6, 4), mat(T, C.ink, { emissive: C.ink, emissiveIntensity: .9 }), g, 1.35, .22, z);
+  mesh(T, new T.ConeGeometry(.15, 1.4, 4), d, g, -2.2, .1, 0, Math.PI / 2 + .1);
+  const ws = new T.Shape(); ws.moveTo(.5, 0); ws.lineTo(-.4, 3.4); ws.lineTo(-1.9, 1.2); ws.lineTo(-.9, .2);
+  const wings = wingPair(T, g, ws, mat(T, shade(C.lava, .8), { side: T.DoubleSide, emissive: C.lavaDeep, emissiveIntensity: .25 }), .2, .1, .2);
+  return { g, wings, jawTop, jawBot };
+}
+function buildActors(T, scene) {
+  const env = new T.Group(); scene.add(env);
+  const lm = mat(T, C.ledge), lh = mat(T, C.ledgeHi, { emissive: C.ledgeHi, emissiveIntensity: .15 });
+  for (const [x, y, z, w] of [[0, -3, 0, 6.5], [-10, 1, -7, 4.5], [9, 2.5, -9, 4.5], [-4, 6, -16, 5], [11, -1.5, 3, 3.5], [-12, -2, 2, 3.5]]) {
+    mesh(T, new T.BoxGeometry(w, .5, 1.8), lm, env, x, y, z);
+    mesh(T, new T.BoxGeometry(w, .08, 1.82), lh, env, x, y + .27, z);
+  }
+  const lavaGeo = new T.PlaneGeometry(140, 140, 56, 56);
+  const lava = new T.Mesh(lavaGeo, mat(T, C.lava, { emissive: C.lavaDeep, emissiveIntensity: .7, roughness: .9 }));
+  lava.rotation.x = -Math.PI / 2; lava.position.y = -8; env.add(lava);
+  const starGeo = new T.BufferGeometry(), sp = [];
+  for (let i = 0; i < 600; i++) {
+    const th = Math.random() * TAU, ph = Math.random() * Math.PI * .45;
+    sp.push(Math.cos(th) * Math.sin(ph) * 75, Math.cos(ph) * 75 - 10, Math.sin(th) * Math.sin(ph) * 75);
+  }
+  starGeo.setAttribute('position', new T.Float32BufferAttribute(sp, 3));
+  env.add(new T.Points(starGeo, new T.PointsMaterial({ color: C.ink, size: .45, fog: false })));
+
+  const player = makeUnicorn(T, C.gold, C.ink, true);
+  const ptero = makePtero(T);
+  scene.add(player.g, ptero.g);
+
+  const fxGeo = new T.IcosahedronGeometry(.14, 0), fxMats = {};
+  for (let i = 0; i < 160; i++) { const o = new T.Mesh(fxGeo, mat(T, C.ink)); o.visible = false; scene.add(o); cut.fx.push({ o, v: new T.Vector3(), t: 0, life: 0, g: 0 }); }
+  const bGeo = new T.SphereGeometry(.3, 14, 10);
+  for (let i = 0; i < 60; i++) {
+    const o = new T.Mesh(bGeo, new T.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: .5, transparent: true, opacity: .5, roughness: .2 }));
+    o.visible = false; scene.add(o); cut.bubbles.push({ o, t: 0, life: 0, vy: 0, ph: 0 });
+  }
+  return { T, env, lava, lavaBase: lavaGeo.attributes.position.array.slice(), player, ptero, fxMats };
+}
+
+function shards(pos, cols, n, speed, g = 9) {
+  let made = 0;
+  for (const f of cut.fx) {
+    if (made >= n) break;
+    if (f.o.visible) continue;
+    const col = cols[made % cols.length];
+    f.o.material.color.set(col); f.o.material.emissive.set(col); f.o.material.emissiveIntensity = .6;
+    f.o.position.copy(pos); f.o.visible = true; f.o.scale.setScalar(rand(.6, 1.4));
+    const th = Math.random() * TAU, ph = Math.acos(rand(-1, 1)), s = speed * rand(.35, 1);
+    f.v.set(Math.sin(ph) * Math.cos(th) * s, Math.cos(ph) * s + speed * .3, Math.sin(ph) * Math.sin(th) * s);
+    f.t = 0; f.life = rand(.8, 1.6); f.g = g; made++;
+  }
+}
+function blowBubble(x, y, z, hue) {
+  const b = cut.bubbles.find(b => !b.o.visible); if (!b) return;
+  const c = `hsl(${Math.round(hue)},100%,70%)`;
+  b.o.material.color.set(c); b.o.material.emissive.set(c);
+  b.o.position.set(x, y, z); b.o.visible = true; b.t = 0; b.life = rand(1.4, 2); b.vy = rand(.3, .9); b.ph = Math.random() * TAU;
+  b.o.scale.setScalar(rand(.6, 1.3));
+}
+function stepFx(dt, time) {
+  for (const f of cut.fx) {
+    if (!f.o.visible) continue;
+    f.t += dt; f.v.y -= f.g * dt; f.o.position.addScaledVector(f.v, dt);
+    f.o.rotation.x += dt * 7; f.o.rotation.y += dt * 5;
+    const k = f.t / f.life; f.o.scale.setScalar(Math.max(.01, (1 - k) * 1.2));
+    if (k >= 1) f.o.visible = false;
+  }
+  for (const b of cut.bubbles) {
+    if (!b.o.visible) continue;
+    b.t += dt; b.o.position.y += b.vy * dt; b.o.position.x += Math.sin(b.t * 3 + b.ph) * .4 * dt;
+    b.o.material.opacity = .5 * Math.min(1, (b.life - b.t) * 3);
+    if (b.t >= b.life) b.o.visible = false;
+  }
+  const pos = A.lava.geometry.attributes.position, base = A.lavaBase;
+  for (let i = 0; i < pos.count; i++) {
+    const x = base[i * 3], y = base[i * 3 + 1];
+    pos.array[i * 3 + 2] = Math.sin(x * .16 + time * 1.4) * .45 + Math.cos(y * .21 + time * 1.1) * .35;
+  }
+  pos.needsUpdate = true; A.lava.geometry.computeVertexNormals();
+}
+function cutFlash() { const f = $('cutFlash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
+function camAt(x, y, z, lx, ly, lz) {
+  const s = cut.shake;
+  cut.cam.position.set(x + rand(-s, s), y + rand(-s, s), z + rand(-s, s));
+  cut.cam.lookAt(lx, ly, lz);
+}
+const ease = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+const once = (a, key) => a[key] ? false : (a[key] = true);
+
+const SCENES = {
+  // the Pterror bursts out of the dark and screams past the camera
+  pterror: {
+    dur: 2.6, title: () => 'The Pterror', sub: () => 'Lance it head-on',
+    setup() {
+      const P = A.player.g; P.visible = true; P.position.set(1.5, -1.55, 1); P.rotation.set(0, -2.2, 0);
+      A.ptero.g.visible = true;
+    },
+    step(t, dt, o, a) {
+      const k = clamp(t / 2.3, 0, 1), e = ease(k);
+      const p0 = [-26, 9, -18], p1 = [-2, 1.5, -1], p2 = [16, 5, 8];
+      const b = i => (1 - e) * (1 - e) * p0[i] + 2 * (1 - e) * e * p1[i] + e * e * p2[i];
+      const g = A.ptero.g; g.position.set(b(0), b(1), b(2));
+      faceDir(g, 2 * (1 - e) * (p1[0] - p0[0]) + 2 * e * (p2[0] - p1[0]), 2 * (1 - e) * (p1[2] - p0[2]) + 2 * e * (p2[2] - p1[2]));
+      flapWings(A.ptero, t, 7, 1, .1);
+      A.ptero.jawBot.rotation.z = -Math.PI / 2 + .25 + Math.abs(Math.sin(t * 9)) * .35;
+      flapWings(A.player, t, 3, .15, -.2);
+      if (k > .45 && once(a, 'scream')) { sfx.ptero(); cut.shake = .35; vib(40); }
+      cut.shake = Math.max(0, cut.shake - dt * .3);
+      camAt(-3.5 * cut.k, -.6, 8 * cut.k, g.position.x * .6, g.position.y * .6, g.position.z * .5);
+    },
+  },
+  // a head-on charge, the hit, then a slow orbit of the victor
+  slain: {
+    dur: 2.5, title: () => 'Pterror slain', sub: o => `+${o.pts.toLocaleString()}`,
+    setup() {
+      const P = A.player.g; P.visible = true; P.position.set(-7, 0, 0); P.rotation.set(0, 0, 0);
+      const Q = A.ptero.g; Q.visible = true; Q.position.set(7, .3, 0); Q.rotation.set(0, Math.PI, 0);
+    },
+    step(t, dt, o, a) {
+      const P = A.player.g, Q = A.ptero.g, hitT = .6;
+      if (t < hitT) {
+        const k = (t / hitT) ** 2;
+        P.position.x = -7 + 4.4 * k; Q.position.x = 7 - 4.5 * k;
+        flapWings(A.player, t, 16, .7, .3); flapWings(A.ptero, t, 10, .8, .1);
+        camAt(0, 1, (10 - t * 2) * cut.k, 0, 0, 0);
+      } else {
+        if (once(a, 'hit')) {
+          Q.visible = false; cutFlash(); cut.shake = .5; sfx.kill(); vib([30, 30, 60]);
+          shards(new A.T.Vector3(.5, .3, 0), [C.lava, C.lavaDeep, C.ink, C.gold], 90, 9, 6);
+        }
+        P.position.x += dt * 1.2; P.position.y += dt * .6; P.rotation.z = Math.min(.3, P.rotation.z + dt);
+        flapWings(A.player, t, 6, .6, .3);
+        const ang = (t - hitT) * .7 - .3;
+        camAt(P.position.x + Math.sin(ang) * 8 * cut.k, P.position.y + 1.6, Math.cos(ang) * 8 * cut.k, P.position.x, P.position.y + .5, 0);
+      }
+      cut.shake = Math.max(0, cut.shake - dt * .6);
+    },
+  },
+  // spiral climb wrapped in a rainbow bubble trail
+  rainbow: {
+    dur: 2.4, title: () => 'Rainbow!', sub: () => 'Lure riders into your bubbles',
+    setup() { A.player.g.visible = true; A.player.g.rotation.set(0, 0, .15); sfx.rainbow(); },
+    step(t, dt, o, a) {
+      const P = A.player.g, ang = t * 2.6, R = 3.4;
+      P.position.set(Math.cos(ang) * R, -3 + t * 2.4, Math.sin(ang) * R);
+      const dx = -Math.sin(ang), dz = Math.cos(ang);
+      faceDir(P, dx, dz);
+      flapWings(A.player, t, 14, .75, .3);
+      a.bub = (a.bub || 0) - dt;
+      if (a.bub <= 0) { a.bub = .035; blowBubble(P.position.x - dx * 1.8, P.position.y + rand(-.3, .3), P.position.z - dz * 1.8, (t * 260) % 360); }
+      camAt(0, P.position.y + 1.8, 12 * cut.k, 0, P.position.y + .2, 0);
+    },
+  },
+  // the champion rears on a ledge under fireworks
+  milestone: {
+    dur: 2.7, title: o => `Wave ${o.wave} conquered`, sub: o => o.sub || '',
+    setup() {
+      const P = A.player.g; P.visible = true; P.position.set(0, -1.55, 0); P.rotation.set(0, -.35, 0);
+      A.player.lance.rotation.z = .9; sfx.wave();
+    },
+    step(t, dt, o, a) {
+      const P = A.player.g;
+      P.rotation.z = .32 + Math.sin(t * 5) * .08;
+      flapWings(A.player, t, 5, .5, .5);
+      A.player.legs[0].rotation.z = .8 + Math.sin(t * 9) * .4; A.player.legs[1].rotation.z = .6 - Math.sin(t * 9) * .4;
+      a.fw = (a.fw || 0) - dt;
+      if (a.fw <= 0) {
+        a.fw = .32;
+        const cols = [[C.rose, C.gold], [C.sky, C.ink], [C.mint, C.gold], [C.gold, C.rose]][Math.floor(Math.random() * 4)];
+        shards(new A.T.Vector3(rand(-9, 9), rand(4, 9), rand(-12, -4)), cols, 26, 5, 2.5);
+        tone(rand(160, 260), 60, .35, 'triangle', .08); noise(.3, .08, 1800, .02);
+      }
+      const ang = -.7 + t * .45;
+      camAt(Math.sin(ang) * 9 * cut.k, .2 + t * .3, Math.cos(ang) * 9 * cut.k, 0, .2, 0);
+    },
+  },
+  // the final fall, tumbling into the lava
+  gameover: {
+    dur: 2.9, title: () => 'Unhorsed', sub: o => `Wave ${o.wave}`,
+    setup() { const P = A.player.g; P.visible = true; P.position.set(0, 5, 0); P.rotation.set(0, .4, 0); sfx.death(); },
+    step(t, dt, o, a) {
+      const P = A.player.g;
+      if (P.visible) {
+        P.position.y = 5 - 13 * Math.min(1, (t / 2) ** 2);
+        P.rotation.z += dt * 3.2; P.rotation.x += dt * 1.9;
+        flapWings(A.player, t, 20, .3, -.3);
+        if (P.position.y <= -7.6) {
+          P.visible = false; cut.shake = .45; sfx.sizzle(); noise(.6, .2, 300); vib([60, 40, 120]);
+          shards(new A.T.Vector3(0, -7.6, 0), [C.lava, C.gold, C.lavaDeep], 80, 7, 7);
+        }
+      }
+      cut.glow.intensity = P.visible ? 1.3 : 1.3 + 4 * Math.max(0, 1 - (t - 2) * 1.5);
+      cut.shake = Math.max(0, cut.shake - dt * .5);
+      const fy = Math.max(-6, P.position.y);
+      camAt(5 * cut.k, fy + 5, 9 * cut.k, 0, fy - 1, 0);
+    },
+  },
+};
+
+function playCut(name, opts = {}, onEnd = null, force = false) {
+  if (cut.active || (!force && performance.now() - cut.lastEnd < CUT_GAP) || !initCut()) return false;
+  const S = SCENES[name];
+  A.player.g.visible = A.ptero.g.visible = false;
+  A.player.g.rotation.set(0, 0, 0); A.player.lance.rotation.z = 0; A.player.legs.forEach(l => l.rotation.z = 0);
+  for (const f of cut.fx) f.o.visible = false;
+  for (const b of cut.bubbles) b.o.visible = false;
+  cut.shake = 0; cut.glow.intensity = 1.3;
+  cut.active = { name, S, t: 0, opts, onEnd };
+  S.setup(opts);
+  $('cutT').textContent = S.title(opts); $('cutS').textContent = S.sub(opts);
+  $('cutCap').classList.remove('show');
+  const el = $('cut'); el.hidden = false; void el.offsetWidth; el.classList.add('on');
+  pointers.clear(); keys.l = keys.r = 0;
+  stepCut(0);
+  return true;
+}
+function endCut() {
+  const a = cut.active; if (!a) return;
+  cut.active = null; cut.lastEnd = performance.now();
+  const el = $('cut'); el.classList.remove('on');
+  setTimeout(() => { if (!cut.active) el.hidden = true; }, 260);
+  pointers.clear();
+  if (a.onEnd) a.onEnd();
+}
+function stepCut(dt) {
+  const a = cut.active;
+  a.t += dt;
+  if (a.t > .4) $('cutCap').classList.add('show');
+  a.S.step(a.t, dt, a.opts, a);
+  stepFx(dt, performance.now() / 1000);
+  cut.r.render(cut.scene, cut.cam);
+  if (a.t >= a.S.dur) endCut();
+}
+$('cut').addEventListener('pointerdown', e => { e.preventDefault(); if (cut.active && cut.active.t > .25) endCut(); });
+
 // ---------- loop ----------
 let last = performance.now(), acc = 0;
 function frame(now) {
-  let dt = Math.min(.05, (now - last) / 1000); last = now;
+  const raw = (now - last) / 1000; last = now;
+  let dt = Math.min(.05, raw);
+  if (cut.active && state !== 'pause') { stepCut(Math.min(.1, raw)); requestAnimationFrame(frame); return; }
   shake = Math.max(0, shake - dt * 45); flash = Math.max(0, flash - dt * 1.6);
   if (state !== 'pause') {
     if (hitStop > 0) { hitStop -= dt; dt = 0; }
