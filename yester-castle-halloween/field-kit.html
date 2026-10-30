@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<title>Goblin Ha' Field Kit</title>
+<title>Adventure Field Kit</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta charset="utf-8">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
 <style>
-/* Layout: a single folded "kit card" column: invitation, where to meet, a tickable packing list, then the small print. */
+/* Layout: a single folded "kit card" column: invitation, a tickable packing list, then the surprise. */
 :root {
   color-scheme: dark;
   --night: #0f1416;
@@ -129,62 +129,12 @@ footer { padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--bone-
 <header>
   <div class="wrap">
     <p class="eyebrow">You're invited · Halloween adventure walk</p>
-    <h1>The <em>Goblin Ha'</em> Field Kit</h1>
-    <p class="lede">We're off on a woodland walk to the ruins of Yester Castle near Gifford in East Lothian. Here's everything you need to get there and come prepared. Everything else stays a surprise.</p>
+    <h1>The <em>Adventure</em> Field Kit</h1>
+    <p class="lede">We're heading off on a Halloween adventure walk through the woods. Here's what to pack. Everything else stays a surprise.</p>
   </div>
 </header>
 
 <main>
-  <section>
-    <div class="wrap">
-      <p class="eyebrow">The walk</p>
-      <h2>How big an adventure?</h2>
-      <dl class="stats">
-        <div><dt>Distance</dt><dd>3 km <small>return</small></dd></div>
-        <div><dt>Climb</dt><dd>100 m</dd></div>
-        <div><dt>Time</dt><dd>1 hr <small>+ stops</small></dd></div>
-        <div><dt>Terrain</dt><dd>Woods <small>+ lots of mud</small></dd></div>
-      </dl>
-      <p class="muted">The walk follows easy woodland tracks beside a burn. It suits most ages and has no scrambling, but the paths are very muddy in places. There and back on the same route.</p>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <p class="eyebrow">Where to meet</p>
-      <h2>Getting there</h2>
-      <div class="meet">
-        <div class="primary">
-          <span class="tag">Short walk</span>
-          <h3>Danskine Lodge</h3>
-          <p>On the B6355, about 2 miles east of Gifford, opposite Danskine Loch.</p>
-          <p class="muted">Postcode <b id="pc">EH41 4PJ</b> · Grid ref NT 566 674</p>
-          <p class="muted">Parking is very limited. Park on a verge east of Danskine Farm and walk back to the gate opposite the loch. Don't block gates or farm tracks.</p>
-          <button class="copy" type="button" data-copy="Danskine Lodge, B6355, Gifford EH41 4PJ">Copy address</button>
-        </div>
-        <div>
-          <span class="tag">Longer walk</span>
-          <h3>Gifford village</h3>
-          <p>Plenty of parking opposite the village park. Follow the Yester path through the woods, about 1.5 miles each way.</p>
-          <p class="muted">Allow an extra hour or so.</p>
-        </div>
-      </div>
-      <p class="muted">There's no public transport within a mile, so sort out lifts in advance.</p>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <p class="eyebrow">Timing</p>
-      <h2>Beat the sunset</h2>
-      <ul class="rules">
-        <li>At the end of October the sun sets around 4:30–4:40pm in East Lothian.</li>
-        <li>Aim to set off by about 3pm so we get the golden light on the way out and are back at the cars by dusk.</li>
-        <li>It gets dark a little earlier under the trees, so torches come out sooner than you'd think.</li>
-      </ul>
-    </div>
-  </section>
-
   <section>
     <div class="wrap">
       <div class="pack-head">
@@ -194,12 +144,13 @@ footer { padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--bone-
         </div>
         <p class="count"><span id="packed">0</span> / <span id="total">0</span> packed</p>
       </div>
+
       <ul class="pack" id="pack">
         <li><input type="checkbox" id="p-boots"><label for="p-boots"><span class="box"></span><b>Wellies or walking boots</b><small>The paths are gloriously muddy. Trainers will regret it.</small></label></li>
         <li><input type="checkbox" id="p-torch"><label for="p-torch"><span class="box"></span><b>A torch or lantern for everyone</b><small>Head torches are ideal. Bring spare batteries.</small></label></li>
         <li><input type="checkbox" id="p-layers"><label for="p-layers"><span class="box"></span><b>Warm layers, hat and gloves</b><small>It's chilly in the woods, even on a sunny afternoon.</small></label></li>
-        <li><input type="checkbox" id="p-rain"><label for="p-rain"><span class="box"></span><b>A waterproof jacket</b><small>It's Scotland in October.</small></label></li>
-        <li><input type="checkbox" id="p-map"><label for="p-map"><span class="box"></span><b>An OS map or offline map</b><small>Phone signal can wander off on its own out here.</small></label></li>
+        <li><input type="checkbox" id="p-rain"><label for="p-rain"><span class="box"></span><b>A waterproof jacket</b><small>October weather has a mind of its own.</small></label></li>
+        <li><input type="checkbox" id="p-map"><label for="p-map"><span class="box"></span><b>An offline map on your phone</b><small>Phone signal can wander off on its own in the woods.</small></label></li>
         <li><input type="checkbox" id="p-phone"><label for="p-phone"><span class="box"></span><b>A fully charged phone</b><small>You'll want it on the day. That's all we're saying.</small></label></li>
         <li><input type="checkbox" id="p-flask"><label for="p-flask"><span class="box"></span><b>A flask of something hot</b><small>Hot chocolate is traditional for adventurers.</small></label></li>
         <li><input type="checkbox" id="p-coins"><label for="p-coins"><span class="box"></span><b>A bag of chocolate coins</b><small>You'll find out why.</small></label></li>
@@ -209,37 +160,17 @@ footer { padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--bone-
   </section>
 
   <section>
-    <div class="wrap">
-      <p class="eyebrow">Ground rules</p>
-      <h2>Keep it safe, keep it lovely</h2>
-      <div class="notice">The castle's underground parts have been closed to the public since 2021 for safety. We'll enjoy the ruins from outside, and nobody goes into any tunnels or vaults.</div>
-      <ul class="rules">
-        <li>The ruins are a protected Scheduled Ancient Monument and aren't maintained, so no climbing on the walls.</li>
-        <li>Take nothing but photos. Every stone belongs to the monument.</li>
-        <li>Stick together in the woods, especially once the torches are on.</li>
-        <li>The site is free to visit, but check for any access news shortly before the day.</li>
-      </ul>
-    </div>
-  </section>
-
-  <section>
     <div class="wrap sealed">
       <span class="seal" aria-hidden="true">?</span>
       <h2>The rest is a surprise</h2>
-      <p class="muted">Stories, quests and a few things that go bump are waiting on the trail. No peeking, no reading up. Just turn up ready for an adventure.</p>
+      <p class="muted">Where we're going, the stories, the quests and a few things that go bump are all being kept under wraps. We'll let you know where and when to meet. Just turn up ready for an adventure.</p>
     </div>
   </section>
 </main>
 
-<footer>
-  <div class="wrap">
-    <p>Afterwards, the Goblin Ha' Hotel in Gifford is a cosy spot for a warm-up.</p>
-  </div>
-</footer>
-
 <script>
 (function () {
-  const KEY = 'goblin-kit-v1';
+  const KEY = 'adventure-kit-v1';
   let got = {};
   try { got = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { got = {}; }
   const boxes = [...document.querySelectorAll('#pack input')];
