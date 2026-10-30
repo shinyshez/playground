@@ -83,6 +83,8 @@ blockquote {
   margin: 0; padding: 0.25rem 0 0.25rem 1.25rem; border-left: 2px solid var(--lantern);
   font-family: var(--font-display); font-style: italic; font-size: var(--step-1); color: var(--bone);
 }
+.prose .fn { font-size: var(--step--1); color: var(--bone-dim); font-style: italic; margin-top: -0.6rem; padding-left: 1rem; }
+sup { color: var(--lantern); font-size: 0.7em; }
 blockquote cite { display: block; font-family: var(--font-body); font-style: normal; font-size: var(--step--1); color: var(--bone-dim); margin-top: 0.35rem; }
 
 /* ---------- Timeline ---------- */
@@ -279,16 +281,17 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 <header class="hero">
   <canvas id="sky" aria-hidden="true"></canvas>
   <div class="wrap">
-    <p class="eyebrow">A Halloween adventure walk · Gifford, East Lothian</p>
+    <p class="eyebrow">A Halloween adventure walk · Gifford, East Lothian · a small, damp corner of a medium-sized planet</p>
     <h1>The <em>Goblin Ha'</em> Walk</h1>
-    <p class="lede">A woodland ramble to Yester Castle, where a 13th-century wizard is said to have raised an army of hobgoblins to build his halls.</p>
+    <p class="lede">A muddy woodland ramble to Yester Castle. According to people who weren't there at the time, it was built by a 13th-century wizard and a subcontracted team of hobgoblins.</p>
     <div class="facts">
       <span><b>~3 km</b> there and back</span>
       <span><b>~1 hr</b> walking</span>
       <span><b>~100 m</b> of climb</span>
       <span><b>55.8906°N, 2.7105°W</b></span>
+      <span><b>Goblins:</b> unconfirmed</span>
     </div>
-    <p class="hint">Move your lantern over the sky to look for the castle. Something is waiting further down the trail. Use the buttons in the bottom corner to switch the scares or sound on and off.</p>
+    <p class="hint">Wave your lantern over the sky to find the castle. Further down the trail, things will jump out at you. This is a feature. The buttons in the bottom corner switch the scares and sound off, for the faint of heart and for whoever is sitting next to you.</p>
   </div>
 </header>
 
@@ -296,8 +299,8 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
   <section>
     <div class="wrap">
       <div class="notice" role="note">
-        <strong>Before you set out</strong>
-        <p>The Goblin Ha' vault has been closed to the public since October 2021, when thieves took stone from the wall that holds it up, and the entrance lock was cut in a later break-in. You can still walk to the castle and look at the ruins from outside for free. Stay out of the tunnel and vault, and check the latest access news before you go.</p>
+        <strong>A word from the management</strong>
+        <p>The Goblin Ha' has been closed to the public since October 2021. Goblins aren't to blame. People are, which is worse: thieves stole stone from the wall that holds the vault up, and later someone cut the lock off the entrance. You can still walk to the castle for free and admire the ruins from outside. Don't go into the tunnel or the vault. Check the latest access news before you go, because the universe changes its mind without telling anyone.</p>
       </div>
     </div>
   </section>
@@ -307,11 +310,13 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
       <p class="eyebrow">The legend</p>
       <h2>The Wizard of Yester</h2>
       <div class="prose">
-        <p>Around 1155 the barony of Yester was granted by King Malcolm IV, and William the Lion confirmed it to a Norman family called Giffard. The name Yester comes from the old Brythonic word <i>ystrad</i>, meaning a valley or strath. Latin clerks spelled it "Zester".</p>
-        <p data-scare="eyes">The most famous Giffard was <b>Sir Hugo de Giffard</b>, a guardian of the boy-king Alexander III, who died in 1267. His neighbours whispered that he was a warlock and a necromancer. They said he struck a bargain with the Devil, who lent him a crew of hobgoblins, and that these goblins dug the great vaulted cavern under the castle in a single night.</p>
-        <blockquote>Old tales tell that his castle, or at least the cave and keep, were wrought by witchcraft.<cite>Paraphrasing the 15th-century chronicler Walter Bower, who called the cavern "Bo' Hall"</cite></blockquote>
-        <p>Four hundred years later Sir Walter Scott put Hugo into his 1808 poem <i>Marmion</i>. In Canto III the innkeeper at Gifford tells of the old lord, and Scott names him "the founder of the Goblin-Hall". The vault has been called the Goblin Ha' (say it "Haw") ever since.</p>
-        <p><b>The cursed pear.</b> One more tale follows Hugo's family. He is said to have given his daughter Margaret a pear as a wedding gift and warned that if harm ever came to it, the family's luck would end. In 1692, the story goes, a new bride at Colstoun House took a bite of it, and misfortune followed. The bitten pear is said to survive there still. Nobody has found a written record of any of this, which makes it a perfect tale for a dark walk.</p>
+        <p>Around 1155, King Malcolm IV granted the barony of Yester, and William the Lion confirmed it to a Norman family called Giffard.<sup>†</sup> The name comes from the old Brythonic word <i>ystrad</i>, meaning a valley. Clerks writing in Latin spelled it "Zester". That's what happens when you let people spell things before spelling has been invented.</p>
+        <p class="fn"><sup>†</sup> The Normans arrived in Scotland the way damp arrives in a cottage: slowly, by invitation, and then everywhere.</p>
+        <p data-scare="eyes">The most famous Giffard was <b>Sir Hugo de Giffard</b>, who died in 1267 and had been a guardian of the boy-king Alexander III. That is a responsible, sensible job, so naturally everyone decided he was a warlock. The story went that Hugo made a deal with the Devil, who supplied a crew of hobgoblins. The hobgoblins built his castle and dug a great vaulted hall under the hill.<sup>‡</sup></p>
+        <p class="fn"><sup>‡</sup> History doesn't record what the Devil got out of the deal. Most building contracts are like that.</p>
+        <blockquote>Old tales tell that his castle, or at least the cave and keep, were wrought by witchcraft.<cite>Walter Bower, 15th-century chronicler (paraphrased), writing nearly two centuries after the fact, which is the traditional distance for reliable gossip. He called the cavern "Bo' Hall".</cite></blockquote>
+        <p>In 1808 Sir Walter Scott, a man who never met a ruin he couldn't write a poem about, put Hugo into <i>Marmion</i>. In Canto III the innkeeper at Gifford tells the tale, and Scott calls Hugo "the founder of the Goblin-Hall". The vault has been the Goblin Ha' ever since. You say it "Haw". Saying "Hah" is how goblins spot tourists.</p>
+        <p><b>The Pear of Doom.</b> Hugo is also said to have given his daughter Margaret a pear and warned her that if any harm came to it, her family's luck would run out. There are many ways to protect a family heirloom. Making it edible isn't one of them. In 1692, the story goes, a new bride at Colstoun House bit into it, and misfortune followed. The bitten pear is said to be kept at Colstoun to this day. Nobody has found a written record of any of this. That has never once stopped a good story.</p>
       </div>
     </div>
   </section>
@@ -319,22 +324,22 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
   <section id="history">
     <div class="wrap">
       <p class="eyebrow">Eight centuries in the woods</p>
-      <h2>What really happened here</h2>
+      <h2>What actually happened (with documents)</h2>
       <ol class="timeline">
-        <li><span class="yr">c.1155</span><span class="ev">Malcolm IV grants the barony of Yester. William the Lion confirms it to Hugo de Giffard, a Norman settler.</span></li>
-        <li class="spooky"><span class="yr">pre-1267</span><span class="ev">The first stone castle and the underground hall are built. Goblins, according to legend.</span></li>
-        <li><span class="yr">1278</span><span class="ev">King Alexander III stays at Yester around 24 May and writes letters to Edward I of England from here.</span></li>
-        <li><span class="yr">1298</span><span class="ev">Alexander de Welles is killed at the Battle of Falkirk. Edward I later hands Yester lands to Adam de Welles.</span></li>
-        <li><span class="yr">1357</span><span class="ev">Heiress Joanna Giffard marries a de la Haye. The Hay family has held the barony ever since.</span></li>
-        <li><span class="yr">1487</span><span class="ev">John Hay becomes the first Lord Hay of Yester.</span></li>
-        <li class="spooky"><span class="yr">1513</span><span class="ev">The 2nd Lord Hay is killed at the Battle of Flodden.</span></li>
-        <li class="spooky"><span class="yr">May 1544</span><span class="ev">English soldiers marching home from burning Edinburgh set fire to the castle, the village and the harvest.</span></li>
-        <li><span class="yr">1547</span><span class="ev">The 4th Lord defends the castle, is captured at the Battle of Pinkie and spends three years in the Tower of London.</span></li>
-        <li><span class="yr">Feb 1548</span><span class="ev">Lord Grey of Wilton takes the castle. Two men are said to have been made to fight a duel in Haddington market place for insulting the boy-king Edward VI.</span></li>
-        <li><span class="yr">1557</span><span class="ev">The family moves to a new tower house where Yester House stands today. The old castle begins to crumble.</span></li>
-        <li><span class="yr">1646</span><span class="ev">The 8th Lord is made Marquess of Tweeddale.</span></li>
-        <li class="spooky"><span class="yr">to 1737</span><span class="ev">The Marquess's falconer lives and keeps his birds in the Goblin Ha'.</span></li>
-        <li class="spooky"><span class="yr">2021</span><span class="ev">Thieves steal stone from the wall under the vault. The castle closes to visitors.</span></li>
+        <li><span class="yr">c.1155</span><span class="ev">Malcolm IV grants the barony of Yester. William the Lion confirms it to Hugo de Giffard, a Norman settler. The paperwork is done, and it doesn't mention goblins.</span></li>
+        <li class="spooky"><span class="yr">pre-1267</span><span class="ev">The first stone castle and the underground hall go up. The builders were goblins according to legend, and humans according to everyone else.</span></li>
+        <li><span class="yr">1278</span><span class="ev">King Alexander III stays at Yester around 24 May and writes letters to Edward I of England from here. It's the most normal thing that ever happens at Yester.</span></li>
+        <li><span class="yr">1298</span><span class="ev">Alexander de Welles is killed at the Battle of Falkirk. Edward I later gives Yester lands to Adam de Welles, which keeps things in the family, or at least in the surname.</span></li>
+        <li><span class="yr">1357</span><span class="ev">Joanna Giffard, co-heiress, marries a de la Haye. The Hays have held the barony ever since. That's nearly 670 years, a long time to keep hold of anything, let alone a barony.</span></li>
+        <li><span class="yr">1487</span><span class="ev">John Hay becomes the first Lord Hay of Yester. There will be quite a lot more of them.</span></li>
+        <li class="spooky"><span class="yr">1513</span><span class="ev">The 2nd Lord Hay is killed at the Battle of Flodden, which went badly for almost every Scot who attended.</span></li>
+        <li class="spooky"><span class="yr">May 1544</span><span class="ev">English soldiers on their way home from burning Edinburgh burn the castle, the village and the harvest too. They were nothing if not thorough.</span></li>
+        <li><span class="yr">1547</span><span class="ev">The 4th Lord defends the castle, is captured at the Battle of Pinkie, and spends three years in the Tower of London, which is the opposite of a holiday.</span></li>
+        <li><span class="yr">Feb 1548</span><span class="ev">Lord Grey of Wilton takes the castle. Two men are reportedly made to fight a duel in Haddington market place for insulting King Edward VI, who was ten.</span></li>
+        <li><span class="yr">1557</span><span class="ev">The family moves to a new tower house where Yester House stands today. Feeling unloved, the old castle starts falling down.</span></li>
+        <li><span class="yr">1646</span><span class="ev">The 8th Lord becomes Marquess of Tweeddale. It's a promotion with more letters in it.</span></li>
+        <li class="spooky"><span class="yr">to 1737</span><span class="ev">The Marquess's falconer lives in the Goblin Ha' with his birds. Of everyone in this story, he's the one we'd most like to ask a few questions.</span></li>
+        <li class="spooky"><span class="yr">2021</span><span class="ev">Thieves steal stone from the wall under the vault, and the castle closes to visitors. More than seven and a half centuries of allegedly goblin-built engineering, undone by persons unknown.</span></li>
       </ol>
     </div>
   </section>
@@ -349,17 +354,17 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <div><dt>Time</dt><dd>1 hr <small>+ goblin hunting</small></dd></div>
         <div><dt>Start grid ref</dt><dd>NT 566 674</dd></div>
       </dl>
-      <p class="muted">The shortest way in starts at Danskine Lodge on the B6355, about 2 miles east of Gifford (postcode EH41 4PJ). Parking there is tight, so park on a verge east past Danskine Farm and walk back to the gate opposite Danskine Loch. For a longer outing, start in Gifford, where there is plenty of parking opposite the village park, and follow the Yester path about 1.5 miles through the woods each way. Paths near the castle are confusing, so carry an OS map.</p>
+      <p class="muted">The shortest way in starts at Danskine Lodge on the B6355, about 2 miles east of Gifford (postcode EH41 4PJ). Parking there is about the size of an optimistic thought, so park on a verge east of Danskine Farm and walk back to the gate opposite Danskine Loch. For a longer outing, start in Gifford, where there's plenty of parking opposite the village park, and follow the Yester path about 1.5 miles through the woods each way. Whoever laid out the paths near the castle had a sense of humour, so carry an OS map.</p>
 
       <ol class="trail">
         <li class="stop">
           <span class="n">1</span>
           <div class="body">
             <h3 data-scare="bats">The Gatehouse</h3>
-            <p>Start at Danskine Lodge, opposite the dark water of Danskine Loch. Pick up the forest track and head into the trees.</p>
-            <div class="quest"><b>Quest</b>Everyone chooses a goblin name for the walk. Use it until you're back at this gate.</div>
+            <p>Start at Danskine Lodge, opposite the dark water of Danskine Loch. Pick up the forest track and walk into the trees, which have been here considerably longer than you and are not impressed.</p>
+            <div class="quest"><b>Quest</b>Everyone picks a goblin name for the walk. Good goblin names sound like a cough, or a small bit of hardware falling down the stairs. Use them until you're back at this gate.</div>
             <details class="tale"><summary>Read aloud at the gate</summary>
-              <p>Long ago, the lord of Yester needed a hall under the hill, deep enough that no army could find it. Masons said it would take ten years. Sir Hugo said it would be done by morning. That night the villagers heard picks ringing in the woods, and laughter that did not sound like men.</p>
+              <p>Long ago, the lord of Yester wanted a hall under the hill, deep enough that no army could find it. The masons said ten years. Sir Hugo said tomorrow. The masons laughed the way people laugh just before they lose a contract. That night the villagers heard picks ringing in the woods, and laughter that didn't belong to anyone with a pension.</p>
             </details>
           </div>
         </li>
@@ -367,18 +372,18 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
           <span class="n">2</span>
           <div class="body">
             <h3>Along the Gifford Water</h3>
-            <p>The track follows the burn through the trees. It is very muddy in places, so this is where wellies earn their keep.</p>
-            <div class="quest"><b>Quest</b>Find the deepest footprint in the mud. Goblin or walker? Make your case.</div>
+            <p>The track follows the burn through the trees and is very muddy in places. This isn't ordinary mud. It is ancient, patient mud, and it has been waiting centuries for your left boot.</p>
+            <div class="quest"><b>Quest</b>Find the deepest footprint. Goblin or walker? Present your evidence to the group. No lawyers allowed.</div>
           </div>
         </li>
         <li class="stop">
           <span class="n">3</span>
           <div class="body">
             <h3 data-scare="peek">The Waterfall and the First Bridge</h3>
-            <p>Listen for the waterfall, then cross the bridge over the Gifford Water.</p>
-            <div class="quest"><b>Quest</b>Everyone falls silent for thirty seconds on the bridge. What can you hear under the water noise?</div>
+            <p>Listen for the waterfall, then cross the bridge over the Gifford Water. Water has been falling off this bit of rock for longer than there have been people to watch it, and it shows no sign of getting bored.</p>
+            <div class="quest"><b>Quest</b>Everyone stays silent on the bridge for thirty seconds. It'll be the hardest thing anyone in your group does all day. What can you hear under the sound of the water?</div>
             <details class="tale"><summary>Read aloud on the bridge</summary>
-              <p>Goblins cannot cross running water carrying anything they stole. That is why, the old folk said, the Yester goblins left their treasure on the far bank. If you find a strange stone on the path, leave it be. Someone may be coming back for it.</p>
+              <p>A goblin can't cross running water carrying anything it stole. Nobody knows who made the rule, but goblins keep it to the letter, because a goblin who breaks it gets talked about. That's why, the old folk said, the Yester goblins left their loot on the far bank. If you see a strange stone on the path, leave it be. Someone may be coming back for it, and they have very small, very sharp opinions.</p>
             </details>
           </div>
         </li>
@@ -386,26 +391,26 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
           <span class="n">4</span>
           <div class="body">
             <h3>Shank Lea Wood</h3>
-            <p>Just before the Hopes Burn, go through Shank Lea Wood and take the path that drops down to the right.</p>
-            <div class="quest"><b>Quest</b>Spot a face in a tree trunk. The person who finds the grumpiest one leads the next stretch.</div>
+            <p>Just before the Hopes Burn, go through Shank Lea Wood and take the path that drops down to the right. If you find yourself in Edinburgh, you've gone too far.</p>
+            <div class="quest"><b>Quest</b>Find a face in a tree trunk. Trees make faces for the same reason people do: they're looking at you. Whoever finds the grumpiest one leads the next stretch.</div>
           </div>
         </li>
         <li class="stop">
           <span class="n">5</span>
           <div class="body">
             <h3 data-scare="whisper" data-text="He knows you're coming…">The Hopes Water Bridge</h3>
-            <p>Keep ahead until a bridge over the Hopes Water appears on your right. Cross it. The castle mound rises ahead, hidden by trees the Marquess of Tweeddale planted in the 1800s.</p>
-            <div class="quest"><b>Quest</b>Whoever first glimpses stone through the trees shouts the password: "Giffard!"</div>
+            <p>Keep ahead until a bridge over the Hopes Water appears on your right, and cross it. The castle mound rises ahead behind trees the Marquess of Tweeddale planted in the 1800s. He may have planted them to hide the castle, or he may just have liked trees. Both are reasonable.</p>
+            <div class="quest"><b>Quest</b>Whoever spots stone through the trees first shouts the password: "Giffard!" Shout it like you mean it. Goblins respect commitment.</div>
           </div>
         </li>
         <li class="stop">
           <span class="n">6</span>
           <div class="body">
             <h3>Yester Castle</h3>
-            <p>Walk around the outside of the ruins. Parts of the old courtyard wall still stand about 9 metres high, and about 12 metres where the hill falls away. At the foot of the wall, a pair of arched doorways behind iron grilles leads down to the Goblin Ha'. Peer in, but don't go in. The ruins aren't maintained and the vault is closed for safety.</p>
-            <div class="quest" data-scare="big"><b>Quest</b>Stand in front of the grilles and count to thirteen out loud. Then listen. Nobody is allowed to say what they heard until you're back at the gate.</div>
+            <p>Walk around the outside of the ruins. Parts of the old courtyard wall still stand about 9 metres high, and about 12 metres where the hill drops away. That's a lot of wall for builders who are traditionally knee-high. At the foot of the wall, a pair of arched doorways behind iron grilles leads down to the Goblin Ha'. Peer in, but don't go in. The ruins aren't maintained, the vault is closed for safety, and "a goblin told me to" has never once worked as an excuse.</p>
+            <div class="quest" data-scare="big"><b>Quest</b>Stand in front of the grilles and count to thirteen out loud. Then listen. Nobody may say what they heard until you're back at the gate. If you heard nothing, that counts as something too.</div>
             <details class="tale"><summary>Read aloud at the grilles</summary>
-              <p>Inside, a passage cut through the rock leads into a hall with a pointed roof and a fireplace high on the wall. Beyond it, steps go down into the hill to an old well. People who came here in daylight said it was cold, quiet and peaceful. Nobody says what it's like at night. The falconer slept down there with his birds until 1737. He never wrote down what kept him company.</p>
+              <p>Inside, a passage cut through the rock leads into a hall with a pointed roof and a fireplace set high in the wall. Beyond it, steps go down into the hill to an old well. People who visited by day called it cold, quiet and peaceful. Nobody has filed a report on the night shift. The falconer lived down there with his birds until 1737, and he left no diary. Draw your own conclusions, but draw them quickly, and from a sensible distance.</p>
             </details>
           </div>
         </li>
@@ -413,8 +418,8 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
           <span class="n">7</span>
           <div class="body">
             <h3>The Way Home</h3>
-            <p>Go back the way you came. Danskine walkers return to the lodge. Gifford walkers can finish at the Goblin Ha' Hotel in the village, named after the vault.</p>
-            <div class="quest" data-scare="whisper" data-text="Don't look back…"><b>Quest</b>On the walk back, nobody looks over their shoulder. If you do, you have to walk at the back.</div>
+            <p>Go back the way you came. It's the only direction in the universe guaranteed to lead home, provided you didn't take any wrong turns. Danskine walkers return to the lodge. Gifford walkers can finish at the Goblin Ha' Hotel in the village, which is named after the vault and has the considerable advantage of a roof.</p>
+            <div class="quest" data-scare="whisper" data-text="Don't look back…"><b>Quest</b>On the way back, nobody looks over their shoulder. Anyone who does has to walk at the back, and will soon find out why that counts as a punishment.</div>
           </div>
         </li>
       </ol>
@@ -428,9 +433,10 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <h2 data-scare="bats">Spot it, tick it</h2>
         <div>
           <p class="score"><span id="score">0</span> / <span id="max">0</span> goblin points</p>
-          <p class="rank" id="rank">Rank: Lost Villager</p>
+          <p class="rank" id="rank">Rank: Bewildered Villager</p>
         </div>
       </div>
+      <p class="muted">Points work on the honour system. Goblins have no honour, so if you're a goblin, please be honest about that as well.</p>
       <div class="meter" aria-hidden="true"><i id="meter"></i></div>
       <div class="hunt" id="huntList"></div>
       <button class="reset" id="reset" type="button">Clear my ticks</button>
@@ -441,7 +447,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     <div class="wrap">
       <p class="eyebrow">Wizard's riddles</p>
       <h2>Answer on the walk home</h2>
-      <p class="muted">Each riddle is answered somewhere on this page. You get one guess per riddle.</p>
+      <p class="muted">Every answer is somewhere on this page. You get one guess per riddle, which is one more than the goblins ever gave anybody.</p>
       <div class="quiz" id="quizBox"></div>
       <p class="score" id="quizScore" hidden></p>
     </div>
@@ -455,29 +461,29 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <div>
           <h3>Bring</h3>
           <ul>
-            <li>Wellies or boots. The paths are very muddy.</li>
-            <li>A head torch or lantern for each person, with spare batteries.</li>
+            <li>Wellies or boots. The paths are very muddy, in the same way the sea is fairly wet.</li>
+            <li>A torch or lantern for everyone, with spare batteries. Darkness in a wood isn't so much a lack of light as a surplus of trees.</li>
             <li>Warm layers. The castle mound is chilly even in daylight.</li>
-            <li>An OS map or a downloaded offline map.</li>
-            <li>A flask of something hot and a bag of "goblin gold" chocolate coins.</li>
+            <li>An OS map or a downloaded offline map. Your phone signal may decide to go on a walk of its own.</li>
+            <li>A flask of something hot and a bag of chocolate coins, henceforth known as goblin gold.</li>
           </ul>
         </div>
         <div>
           <h3>Timing</h3>
           <ul>
-            <li>At the end of October the sun sets around 4:30–4:40pm in East Lothian.</li>
-            <li>Set off by about 3pm to reach the castle in the eerie golden hour and get back to the road by dusk.</li>
-            <li>The woods get dark fast under the trees, long before the sky does.</li>
+            <li>At the end of October the sun sets around 4:30–4:40pm in East Lothian. It does this every year and won't make an exception for you.</li>
+            <li>Set off by about 3pm to reach the castle in the golden hour and get back to the road by dusk.</li>
+            <li>Under the trees it gets dark long before the sky will admit it.</li>
           </ul>
         </div>
         <div>
           <h3>Stay safe</h3>
           <ul>
-            <li>Don't enter the Goblin Ha' tunnel or vault. It's closed and the wall is damaged.</li>
-            <li>Don't climb on the ruins. It's a protected Scheduled Ancient Monument and nothing is maintained.</li>
-            <li>There's no public transport within a mile, so plan how you'll get there.</li>
-            <li>Don't block gates or farm tracks when you park.</li>
-            <li>Take nothing but photos. Even a pebble from the walls is part of the monument.</li>
+            <li>Don't go into the Goblin Ha' tunnel or vault. It's closed and the wall is damaged. Of everything on this page, this is the bit to take seriously.</li>
+            <li>Don't climb on the ruins. They're a protected Scheduled Ancient Monument, nothing is maintained, and gravity has had about 750 years of practice here.</li>
+            <li>There's no public transport within a mile, so sort out how you're getting there before you set off.</li>
+            <li>Don't block gates or farm tracks when you park. Farmers are scarier than goblins and drive bigger vehicles.</li>
+            <li>Take nothing but photos. Even a pebble from the walls is part of the monument. See 2021, above.</li>
           </ul>
         </div>
       </div>
@@ -487,7 +493,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 
 <footer>
   <div class="wrap">
-    <p>Legends are retold for fun. Dates and facts come from the sources below. Access arrangements can change, so check before you go.</p>
+    <p>The legends are retold for fun and the jokes are entirely our own fault. Dates and facts come from the sources below. Access arrangements can change, so check before you go.</p>
     <ul>
       <li><a href="https://en.wikipedia.org/wiki/Yester_Castle">Yester Castle, Wikipedia</a></li>
       <li><a href="https://canmore.org.uk/site/56062">Yester Castle and Goblin Ha', Canmore</a></li>
@@ -654,13 +660,13 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     ['waterfall', 'The waterfall on the Gifford Water', 2],
     ['bridges', 'Both bridges crossed', 2],
     ['face', 'A face in a tree trunk', 3],
-    ['fungus', 'A toadstool or bracket fungus', 2],
+    ['fungus', 'A toadstool you will absolutely not eat', 2],
     ['ivy', 'Ivy climbing the castle stones', 1],
-    ['wall', 'The tallest stretch of curtain wall', 2],
+    ['wall', 'The tallest bit of goblin-built wall', 2],
     ['grilles', 'The iron grilles of the Goblin Ha\'', 3],
     ['door', 'A doorway you\'d have to crouch through', 3],
     ['crow', 'A crow, rook or raven', 2],
-    ['owl', 'An owl hoot (it counts if you only hear it)', 4],
+    ['owl', 'An owl hoot (hearing counts, owls are shy)', 4],
     ['web', 'A spider web with dew or rain on it', 2],
     ['leaf', 'A perfect red or gold leaf', 1],
     ['moon', 'The moon through the branches', 3],
@@ -682,7 +688,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     list.appendChild(wrap);
   });
   function save() { try { localStorage.setItem(KEY, JSON.stringify(got)); } catch (e) {} }
-  const ranks = [[0, 'Lost Villager'], [6, 'Apprentice Goblin-Spotter'], [14, 'Keeper of the Lantern'], [22, 'Falconer of the Ha\''], [30, 'Wizard of Yester']];
+  const ranks = [[0, 'Bewildered Villager'], [6, 'Apprentice Goblin-Spotter'], [14, 'Keeper of the Slightly Wobbly Lantern'], [22, 'Falconer of the Ha\''], [30, 'Wizard of Yester (Unlicensed)']];
   function tally() {
     const sc = items.reduce((a, i) => a + (got[i[0]] ? i[2] : 0), 0);
     document.getElementById('score').textContent = sc;
@@ -700,11 +706,11 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 
   // ---------- Quiz ----------
   const qs = [
-    ['Who did the legend say built the Goblin Ha\'?', ['Roman legionaries', 'Hobgoblins', 'Norwegian raiders'], 1, 'Sir Hugo de Giffard\'s hobgoblins, summoned with the Devil\'s help.'],
+    ['Who did the legend say built the Goblin Ha\'?', ['Roman legionaries', 'Hobgoblins', 'A very determined badger'], 1, 'Sir Hugo de Giffard\'s hobgoblins, summoned with the Devil\'s help.'],
     ['How do you say "Ha\'"?', ['Hah', 'Hay', 'Haw'], 2, 'It\'s "Haw", the Scots word for hall.'],
-    ['Which poet called Hugo "the founder of the Goblin-Hall"?', ['Robert Burns', 'Sir Walter Scott', 'Lord Byron'], 1, 'Scott, in Canto III of Marmion (1808).'],
-    ['Who lived in the Goblin Ha\' until 1737?', ['A falconer', 'A hermit', 'A smuggler'], 0, 'The Marquess of Tweeddale\'s falconer.'],
-    ['What cursed object did Hugo give his daughter?', ['A silver ring', 'A pear', 'A raven feather'], 1, 'The Colstoun pear, bitten by a bride in 1692, so the story goes.'],
+    ['Which poet called Hugo "the founder of the Goblin-Hall"?', ['Robert Burns', 'Sir Walter Scott', 'The innkeeper\'s cat'], 1, 'Scott, in Canto III of Marmion (1808).'],
+    ['Who lived in the Goblin Ha\' until 1737?', ['A falconer', 'A hermit', 'Three goats in a long coat'], 0, 'The Marquess of Tweeddale\'s falconer.'],
+    ['What cursed object did Hugo give his daughter?', ['A silver ring', 'A pear', 'A haunted sandwich'], 1, 'The Colstoun pear, bitten by a bride in 1692, so the story goes.'],
   ];
   const box = document.getElementById('quizBox');
   let answered = 0, right = 0;
@@ -722,7 +728,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         answered++;
         if (answered === qs.length) {
           const s = document.getElementById('quizScore');
-          s.innerHTML = '<span>' + right + '</span> / ' + qs.length + (right === qs.length ? ' · Sir Hugo would be proud.' : right >= 3 ? ' · The goblins let you pass.' : ' · The goblins are laughing.');
+          s.innerHTML = '<span>' + right + '</span> / ' + qs.length + (right === qs.length ? ' · Sir Hugo would be proud, and slightly worried.' : right >= 3 ? ' · The goblins let you pass. Grudgingly.' : ' · The goblins are laughing. It is not a nice sound.');
           s.hidden = false;
         }
       });
