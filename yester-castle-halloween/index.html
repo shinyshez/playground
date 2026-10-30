@@ -190,11 +190,89 @@ footer { padding-block: 2.5rem 3rem; font-size: var(--step--1); color: var(--bon
 footer .wrap { display: grid; gap: 0.75rem; }
 footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 
+/* ---------- Jump scares ---------- */
+:root { --goblin: #5f7d4b; --goblin-dark: #2c3d24; --goblin-eye: #ffd34d; --maw: #1a0b09; }
+.g-skin { fill: var(--goblin); }
+.g-dark { fill: var(--goblin-dark); }
+.g-eye { fill: var(--goblin-eye); }
+.g-pupil { fill: var(--maw); }
+.g-maw { fill: var(--maw); }
+.g-tooth { fill: var(--bone); }
+.g-brow { fill: none; stroke: var(--goblin-dark); stroke-width: 8; stroke-linecap: round; }
+.bat-shape { fill: #050708; }
+
+.scare-layer { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+.bat { position: absolute; left: 0; top: 0; width: 46px; height: 25px; }
+.bat svg { width: 100%; height: 100%; animation: flap 0.16s ease-in-out infinite alternate; transform-origin: 50% 40%; }
+@keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(0.35); } }
+
+.big { display: grid; place-items: center; background: rgba(5, 3, 3, 0.85); }
+.big::before { content: ""; position: absolute; inset: 0; background: var(--ember); animation: flash 0.9s steps(2, jump-none) forwards; mix-blend-mode: screen; }
+.big svg { width: min(92vw, 92vh); height: auto; animation: lunge 1.5s cubic-bezier(.2, 1.6, .4, 1) forwards; filter: drop-shadow(0 0 40px rgba(255, 211, 77, 0.35)); }
+@keyframes flash { 0% { opacity: 0.9; } 30% { opacity: 0; } 45% { opacity: 0.6; } 100% { opacity: 0; } }
+@keyframes lunge {
+  0% { transform: scale(0.15) rotate(-8deg); }
+  18% { transform: scale(1.15) rotate(4deg); }
+  24%, 34%, 44% { transform: scale(1.1) translateX(-12px) rotate(-3deg); }
+  29%, 39%, 49% { transform: scale(1.1) translateX(12px) rotate(3deg); }
+  75% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+.shake { animation: shake 0.5s linear; }
+@keyframes shake {
+  10%, 50%, 90% { transform: translate(-6px, 3px); }
+  30%, 70% { transform: translate(6px, -3px); }
+}
+
+.peek svg {
+  position: absolute; right: max(4vw, env(safe-area-inset-right, 0px)); bottom: 0;
+  width: min(48vw, 260px); height: auto;
+  animation: peek 2.6s ease-in-out forwards; transform: translateY(100%);
+}
+@keyframes peek {
+  0% { transform: translateY(100%) rotate(10deg); }
+  25%, 70% { transform: translateY(38%) rotate(-6deg); }
+  78% { transform: translateY(30%) rotate(4deg); }
+  100% { transform: translateY(110%) rotate(12deg); }
+}
+
+.eyes { background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.92)); animation: fadeInOut 3.2s ease forwards; }
+.eyes span {
+  position: absolute; width: 46px; height: 14px;
+  background:
+    radial-gradient(ellipse 7px 5px at 10px 7px, var(--goblin-eye) 60%, transparent 70%),
+    radial-gradient(ellipse 7px 5px at 36px 7px, var(--goblin-eye) 60%, transparent 70%);
+  filter: drop-shadow(0 0 6px var(--goblin-eye));
+  animation: blink 1.1s ease infinite;
+}
+@keyframes blink { 0%, 85%, 100% { transform: scaleY(1); } 92% { transform: scaleY(0.05); } }
+@keyframes fadeInOut { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
+
+.whisper { display: grid; place-items: center; text-align: center; padding-inline: 1rem; background: rgba(0, 0, 0, 0.6); animation: fadeInOut 2.6s ease forwards; }
+.whisper p {
+  font-family: var(--font-display); font-style: italic; font-size: clamp(2.2rem, 9vw, 5.5rem);
+  color: var(--ember); text-shadow: 0 0 24px rgba(194, 85, 43, 0.7);
+  animation: flicker 0.9s steps(1) infinite;
+}
+@keyframes flicker { 0%, 100% { opacity: 1; } 12% { opacity: 0.2; } 18% { opacity: 1; } 55% { opacity: 0.6; } 60% { opacity: 1; } }
+
+.scare-controls {
+  position: fixed; z-index: 60; display: flex; gap: 0.4rem;
+  left: max(12px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.scare-controls button {
+  font: inherit; font-size: var(--step--1); padding: 0.45rem 0.8rem; border-radius: 999px; cursor: pointer;
+  background: var(--night-2); color: var(--bone-dim); border: 1px solid var(--rule);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.scare-controls button[aria-pressed="true"] { color: var(--lantern); border-color: var(--lantern); }
+
 @media (max-width: 30rem) {
   .timeline li { grid-template-columns: 4.2rem 1fr; gap: 0.75rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .meter i { transition: none; }
+  .bat svg, .big svg, .big::before, .peek svg, .eyes span, .whisper p, .shake { animation-duration: 0.01s; animation-iteration-count: 1; }
 }
 </style>
 
@@ -210,7 +288,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
       <span><b>~100 m</b> of climb</span>
       <span><b>55.8906°N, 2.7105°W</b></span>
     </div>
-    <p class="hint">Move your lantern over the sky to look for the castle.</p>
+    <p class="hint">Move your lantern over the sky to look for the castle. Something is waiting further down the trail. Use the buttons in the bottom corner to switch the scares or sound on and off.</p>
   </div>
 </header>
 
@@ -230,7 +308,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
       <h2>The Wizard of Yester</h2>
       <div class="prose">
         <p>Around 1155 the barony of Yester was granted by King Malcolm IV, and William the Lion confirmed it to a Norman family called Giffard. The name Yester comes from the old Brythonic word <i>ystrad</i>, meaning a valley or strath. Latin clerks spelled it "Zester".</p>
-        <p>The most famous Giffard was <b>Sir Hugo de Giffard</b>, a guardian of the boy-king Alexander III, who died in 1267. His neighbours whispered that he was a warlock and a necromancer. They said he struck a bargain with the Devil, who lent him a crew of hobgoblins, and that these goblins dug the great vaulted cavern under the castle in a single night.</p>
+        <p data-scare="eyes">The most famous Giffard was <b>Sir Hugo de Giffard</b>, a guardian of the boy-king Alexander III, who died in 1267. His neighbours whispered that he was a warlock and a necromancer. They said he struck a bargain with the Devil, who lent him a crew of hobgoblins, and that these goblins dug the great vaulted cavern under the castle in a single night.</p>
         <blockquote>Old tales tell that his castle, or at least the cave and keep, were wrought by witchcraft.<cite>Paraphrasing the 15th-century chronicler Walter Bower, who called the cavern "Bo' Hall"</cite></blockquote>
         <p>Four hundred years later Sir Walter Scott put Hugo into his 1808 poem <i>Marmion</i>. In Canto III the innkeeper at Gifford tells of the old lord, and Scott names him "the founder of the Goblin-Hall". The vault has been called the Goblin Ha' (say it "Haw") ever since.</p>
         <p><b>The cursed pear.</b> One more tale follows Hugo's family. He is said to have given his daughter Margaret a pear as a wedding gift and warned that if harm ever came to it, the family's luck would end. In 1692, the story goes, a new bride at Colstoun House took a bite of it, and misfortune followed. The bitten pear is said to survive there still. Nobody has found a written record of any of this, which makes it a perfect tale for a dark walk.</p>
@@ -277,7 +355,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <li class="stop">
           <span class="n">1</span>
           <div class="body">
-            <h3>The Gatehouse</h3>
+            <h3 data-scare="bats">The Gatehouse</h3>
             <p>Start at Danskine Lodge, opposite the dark water of Danskine Loch. Pick up the forest track and head into the trees.</p>
             <div class="quest"><b>Quest</b>Everyone chooses a goblin name for the walk. Use it until you're back at this gate.</div>
             <details class="tale"><summary>Read aloud at the gate</summary>
@@ -296,7 +374,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <li class="stop">
           <span class="n">3</span>
           <div class="body">
-            <h3>The Waterfall and the First Bridge</h3>
+            <h3 data-scare="peek">The Waterfall and the First Bridge</h3>
             <p>Listen for the waterfall, then cross the bridge over the Gifford Water.</p>
             <div class="quest"><b>Quest</b>Everyone falls silent for thirty seconds on the bridge. What can you hear under the water noise?</div>
             <details class="tale"><summary>Read aloud on the bridge</summary>
@@ -315,7 +393,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <li class="stop">
           <span class="n">5</span>
           <div class="body">
-            <h3>The Hopes Water Bridge</h3>
+            <h3 data-scare="whisper" data-text="He knows you're coming…">The Hopes Water Bridge</h3>
             <p>Keep ahead until a bridge over the Hopes Water appears on your right. Cross it. The castle mound rises ahead, hidden by trees the Marquess of Tweeddale planted in the 1800s.</p>
             <div class="quest"><b>Quest</b>Whoever first glimpses stone through the trees shouts the password: "Giffard!"</div>
           </div>
@@ -325,7 +403,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
           <div class="body">
             <h3>Yester Castle</h3>
             <p>Walk around the outside of the ruins. Parts of the old courtyard wall still stand about 9 metres high, and about 12 metres where the hill falls away. At the foot of the wall, a pair of arched doorways behind iron grilles leads down to the Goblin Ha'. Peer in, but don't go in. The ruins aren't maintained and the vault is closed for safety.</p>
-            <div class="quest"><b>Quest</b>Stand in front of the grilles and count to thirteen out loud. Then listen. Nobody is allowed to say what they heard until you're back at the gate.</div>
+            <div class="quest" data-scare="big"><b>Quest</b>Stand in front of the grilles and count to thirteen out loud. Then listen. Nobody is allowed to say what they heard until you're back at the gate.</div>
             <details class="tale"><summary>Read aloud at the grilles</summary>
               <p>Inside, a passage cut through the rock leads into a hall with a pointed roof and a fireplace high on the wall. Beyond it, steps go down into the hill to an old well. People who came here in daylight said it was cold, quiet and peaceful. Nobody says what it's like at night. The falconer slept down there with his birds until 1737. He never wrote down what kept him company.</p>
             </details>
@@ -336,7 +414,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
           <div class="body">
             <h3>The Way Home</h3>
             <p>Go back the way you came. Danskine walkers return to the lodge. Gifford walkers can finish at the Goblin Ha' Hotel in the village, named after the vault.</p>
-            <div class="quest"><b>Quest</b>On the walk back, nobody looks over their shoulder. If you do, you have to walk at the back.</div>
+            <div class="quest" data-scare="whisper" data-text="Don't look back…"><b>Quest</b>On the walk back, nobody looks over their shoulder. If you do, you have to walk at the back.</div>
           </div>
         </li>
       </ol>
@@ -347,7 +425,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     <div class="wrap">
       <p class="eyebrow">Goblin hunt</p>
       <div class="hunt-head">
-        <h2>Spot it, tick it</h2>
+        <h2 data-scare="bats">Spot it, tick it</h2>
         <div>
           <p class="score"><span id="score">0</span> / <span id="max">0</span> goblin points</p>
           <p class="rank" id="rank">Rank: Lost Villager</p>
@@ -420,6 +498,34 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     </ul>
   </div>
 </footer>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="goblin" viewBox="0 0 240 240">
+    <path class="g-dark" d="M72 108 L4 58 L58 150 Z"/>
+    <path class="g-dark" d="M168 108 L236 58 L182 150 Z"/>
+    <ellipse class="g-skin" cx="120" cy="132" rx="70" ry="88"/>
+    <circle class="g-dark" cx="78" cy="160" r="5"/>
+    <circle class="g-dark" cx="160" cy="88" r="4"/>
+    <path class="g-brow" d="M72 104 Q95 88 112 112"/>
+    <path class="g-brow" d="M168 104 Q145 88 128 112"/>
+    <ellipse class="g-eye" cx="95" cy="122" rx="16" ry="11"/>
+    <ellipse class="g-eye" cx="145" cy="122" rx="16" ry="11"/>
+    <ellipse class="g-pupil" cx="97" cy="122" rx="3" ry="9"/>
+    <ellipse class="g-pupil" cx="143" cy="122" rx="3" ry="9"/>
+    <path class="g-dark" d="M120 126 Q108 152 111 162 Q120 168 129 162 Q132 152 120 126 Z"/>
+    <path class="g-maw" d="M70 174 Q120 222 170 174 Q120 192 70 174 Z"/>
+    <path class="g-tooth" d="M86 178 L92 194 L98 180 Z M106 181 L113 199 L119 183 Z M121 183 L127 199 L134 181 Z M142 180 L148 194 L154 178 Z"/>
+    <path class="g-tooth" d="M100 205 L105 193 L110 207 Z M130 207 L135 193 L140 205 Z"/>
+  </symbol>
+  <symbol id="bat" viewBox="0 0 30 16">
+    <path class="bat-shape" d="M0 9 Q5 0 10 6 Q12 2 15 5 Q18 2 20 6 Q25 0 30 9 Q25 7 22 11 Q18 8 15 14 Q12 8 8 11 Q5 7 0 9 Z"/>
+  </symbol>
+</svg>
+
+<div class="scare-controls">
+  <button type="button" id="scareToggle" aria-pressed="true">Scares on</button>
+  <button type="button" id="soundToggle" aria-pressed="false">Sound off</button>
+</div>
 
 <script>
 (function () {
@@ -624,5 +730,119 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     });
     box.appendChild(d);
   });
+
+  // ---------- Jump scares ----------
+  const PREF = 'goblin-scares-v1';
+  let prefs = { scares: !reduce, sound: false };
+  try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREF) || '{}')); } catch (e) {}
+  prefs.sound = false; // sound always needs a fresh tap
+  const scareBtn = document.getElementById('scareToggle');
+  const soundBtn = document.getElementById('soundToggle');
+  function syncButtons() {
+    scareBtn.setAttribute('aria-pressed', prefs.scares); scareBtn.textContent = prefs.scares ? 'Scares on' : 'Scares off';
+    soundBtn.setAttribute('aria-pressed', prefs.sound); soundBtn.textContent = prefs.sound ? 'Sound on' : 'Sound off';
+  }
+  function savePrefs() { try { localStorage.setItem(PREF, JSON.stringify({ scares: prefs.scares })); } catch (e) {} }
+
+  let audio = null;
+  function ac() {
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+    if (audio.state === 'suspended') audio.resume();
+    return audio;
+  }
+  scareBtn.addEventListener('click', () => { prefs.scares = !prefs.scares; syncButtons(); savePrefs(); });
+  soundBtn.addEventListener('click', () => {
+    prefs.sound = !prefs.sound; syncButtons();
+    if (prefs.sound) { ac(); sound.cackle(0.5); }
+  });
+  syncButtons();
+
+  // Synthesised sounds: no files needed
+  function noise(a, dur, filterFreq, gain, t0) {
+    const len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = a.createBufferSource(); src.buffer = buf;
+    const f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = filterFreq; f.Q.value = 0.8;
+    const g = a.createGain(); g.gain.setValueAtTime(gain, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+    src.connect(f).connect(g).connect(a.destination); src.start(t0);
+  }
+  function tone(a, type, f1, f2, dur, gain, t0) {
+    const o = a.createOscillator(), g = a.createGain(); o.type = type;
+    o.frequency.setValueAtTime(f1, t0); o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(gain, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.05);
+  }
+  const sound = {
+    screech() { const a = ac(); if (!a) return; const t = a.currentTime;
+      tone(a, 'sawtooth', 1400, 180, 1.1, 0.25, t); tone(a, 'square', 980, 120, 1.0, 0.12, t + 0.03); noise(a, 0.7, 2400, 0.5, t); },
+    flutter() { const a = ac(); if (!a) return; const t = a.currentTime;
+      for (let i = 0; i < 14; i++) noise(a, 0.06, 900 + Math.random() * 900, 0.25, t + i * 0.09); },
+    cackle(vol = 1) { const a = ac(); if (!a) return; const t = a.currentTime;
+      [0, 0.14, 0.28, 0.42, 0.56].forEach((d, i) => tone(a, 'square', 620 - i * 40, 380 - i * 30, 0.11, 0.08 * vol, t + d)); },
+    drone() { const a = ac(); if (!a) return; const t = a.currentTime;
+      tone(a, 'sine', 55, 48, 3, 0.3, t); tone(a, 'triangle', 82, 70, 3, 0.1, t); },
+    breath() { const a = ac(); if (!a) return; const t = a.currentTime; noise(a, 1.8, 700, 0.35, t); },
+  };
+
+  function layer(cls, ms) {
+    const el = document.createElement('div'); el.className = 'scare-layer ' + cls; el.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), ms);
+    return el;
+  }
+  const goblinSVG = '<svg viewBox="0 0 240 240"><use href="#goblin"/></svg>';
+  const scares = {
+    bats() {
+      const el = layer('', 4200);
+      for (let i = 0; i < 16; i++) {
+        const b = document.createElement('div'); b.className = 'bat';
+        b.innerHTML = '<svg viewBox="0 0 30 16"><use href="#bat"/></svg>';
+        const s = 0.6 + Math.random() * 1.4, y = Math.random() * innerHeight * 0.8, dy = (Math.random() - 0.5) * 240;
+        const fromLeft = Math.random() > 0.35, x0 = fromLeft ? -80 : innerWidth + 80, x1 = fromLeft ? innerWidth + 80 : -80;
+        el.appendChild(b);
+        b.animate([
+          { transform: `translate(${x0}px, ${y}px) scale(${s})` },
+          { transform: `translate(${(x0 + x1) / 2}px, ${y + dy}px) scale(${s * 1.2})` },
+          { transform: `translate(${x1}px, ${y - dy / 2}px) scale(${s})` },
+        ], { duration: 1600 + Math.random() * 1600, delay: Math.random() * 600, easing: 'ease-in-out', fill: 'both' });
+      }
+      if (prefs.sound) sound.flutter();
+    },
+    peek() { layer('peek', 2700).innerHTML = goblinSVG; if (prefs.sound) setTimeout(() => sound.cackle(), 600); },
+    eyes() {
+      const el = layer('eyes', 3300);
+      for (let i = 0; i < 9; i++) {
+        const e = document.createElement('span');
+        e.style.left = (5 + Math.random() * 85) + '%'; e.style.top = (8 + Math.random() * 80) + '%';
+        e.style.animationDelay = (Math.random() * 1.1) + 's';
+        e.style.transform = 'scale(' + (0.7 + Math.random()) + ')';
+        el.appendChild(e);
+      }
+      if (prefs.sound) sound.drone();
+    },
+    whisper(src) {
+      const el = layer('whisper', 2700); const p = document.createElement('p');
+      p.textContent = src.dataset.text || 'Behind you…'; el.appendChild(p);
+      if (prefs.sound) sound.breath();
+    },
+    big() {
+      layer('big', 1600).innerHTML = goblinSVG;
+      const m = document.querySelector('main'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake');
+      setTimeout(() => m.classList.remove('shake'), 600);
+      if (prefs.sound) sound.screech();
+      if (navigator.vibrate) { try { navigator.vibrate([120, 60, 200]); } catch (e) {} }
+    },
+  };
+
+  let busy = false;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting || !prefs.scares || busy) return;
+      const el = en.target; io.unobserve(el);
+      busy = true; setTimeout(() => { busy = false; }, 1800);
+      scares[el.dataset.scare](el);
+    });
+  }, { rootMargin: '-40% 0px -40% 0px' });
+  document.querySelectorAll('[data-scare]').forEach(el => io.observe(el));
 })();
 </script>
