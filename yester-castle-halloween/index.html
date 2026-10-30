@@ -1,0 +1,628 @@
+<title>The Goblin Ha' Walk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+/* Layout: a night walk down one long woodland path. A single column "trail" with
+   stations pinned to a lantern-lit line, framed by a torchlit hero and a field kit. */
+:root {
+  color-scheme: dark;
+  --night: #0f1416;        /* wet slate under trees */
+  --night-2: #172024;      /* raised stone */
+  --moss: #2c3b2f;         /* lichen on the curtain wall */
+  --bone: #e9e1cc;         /* parchment / text */
+  --bone-dim: #a9a593;     /* secondary text */
+  --lantern: #f0a43a;      /* lantern flame accent */
+  --ember: #c2552b;        /* warnings, embers */
+  --rule: #2e3a3c;
+  --font-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --font-label: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3rem;
+  --step-2: 1.7rem;
+  --step-3: 2.4rem;
+  --step-4: clamp(2.6rem, 8vw, 5rem);
+}
+* { box-sizing: border-box; }
+html { background: var(--night); }
+body {
+  background: var(--night);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+a { color: var(--lantern); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible + label, summary:focus-visible {
+  outline: 2px solid var(--lantern); outline-offset: 3px; border-radius: 4px;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; line-height: 1.1; margin: 0; }
+p { margin: 0; }
+.wrap {
+  max-width: 46rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.eyebrow {
+  font-family: var(--font-label); letter-spacing: 0.14em; font-size: var(--step--1);
+  color: var(--lantern); text-transform: lowercase;
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--rule); }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero .wrap { position: relative; padding-block: 4.5rem 3.5rem; display: grid; gap: 1.1rem; }
+.hero h1 { font-size: var(--step-4); letter-spacing: -0.01em; }
+.hero h1 em { color: var(--lantern); font-style: italic; }
+.hero .lede { font-size: var(--step-1); color: var(--bone); max-width: 34rem; font-family: var(--font-display); font-style: italic; }
+.facts {
+  display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 0.75rem;
+  font-variant-numeric: tabular-nums; font-size: var(--step--1); color: var(--bone-dim);
+}
+.facts b { color: var(--bone); font-weight: 500; }
+.hint { font-size: var(--step--1); color: var(--bone-dim); font-style: italic; }
+
+/* ---------- Sections ---------- */
+section { padding-block: 3.5rem; border-bottom: 1px solid var(--rule); }
+section > .wrap { display: grid; gap: 1.25rem; }
+section h2 { font-size: var(--step-3); }
+.prose { display: grid; gap: 1rem; max-width: 65ch; }
+.prose p { color: var(--bone); }
+.muted { color: var(--bone-dim); }
+
+.notice {
+  border: 1px solid var(--ember); background: color-mix(in srgb, var(--ember) 12%, var(--night));
+  padding: 1rem 1.15rem; border-radius: 6px; display: grid; gap: 0.35rem;
+}
+.notice strong { font-family: var(--font-label); letter-spacing: 0.08em; color: #f2b59a; font-weight: 400; }
+
+blockquote {
+  margin: 0; padding: 0.25rem 0 0.25rem 1.25rem; border-left: 2px solid var(--lantern);
+  font-family: var(--font-display); font-style: italic; font-size: var(--step-1); color: var(--bone);
+}
+blockquote cite { display: block; font-family: var(--font-body); font-style: normal; font-size: var(--step--1); color: var(--bone-dim); margin-top: 0.35rem; }
+
+/* ---------- Timeline ---------- */
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.timeline li {
+  display: grid; grid-template-columns: 5.5rem 1fr; gap: 1rem;
+  padding-block: 0.7rem; border-top: 1px dashed var(--rule);
+}
+.timeline li:first-child { border-top: 0; }
+.timeline .yr { font-family: var(--font-display); font-size: var(--step-1); color: var(--lantern); font-variant-numeric: tabular-nums; line-height: 1.3; }
+.timeline .ev { min-width: 0; }
+.timeline .spooky .yr { color: var(--ember); }
+
+/* ---------- Trail ---------- */
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1px;
+  background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden;
+}
+.stats div { background: var(--night-2); padding: 0.85rem 1rem; display: grid; gap: 0.1rem; }
+.stats dt { font-family: var(--font-label); letter-spacing: 0.1em; font-size: var(--step--1); color: var(--bone-dim); }
+.stats dd { margin: 0; font-family: var(--font-display); font-size: var(--step-2); font-variant-numeric: tabular-nums; }
+.stats dd small { font-family: var(--font-body); font-size: var(--step--1); color: var(--bone-dim); }
+
+.trail { list-style: none; margin: 0.5rem 0 0; padding: 0; position: relative; display: grid; gap: 2rem; }
+.trail::before {
+  content: ""; position: absolute; left: 1.15rem; top: 0.5rem; bottom: 0.5rem; width: 2px;
+  background: repeating-linear-gradient(to bottom, var(--lantern) 0 6px, transparent 6px 14px); opacity: 0.55;
+}
+.stop { position: relative; display: grid; grid-template-columns: 2.3rem 1fr; gap: 1rem; }
+.stop .n {
+  width: 2.3rem; height: 2.3rem; border-radius: 50%; display: grid; place-items: center;
+  background: var(--night); border: 2px solid var(--lantern); color: var(--lantern);
+  font-family: var(--font-display); font-size: var(--step-1); position: relative; z-index: 1;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--lantern) 35%, transparent);
+}
+.stop .body { min-width: 0; display: grid; gap: 0.5rem; }
+.stop h3 { font-size: var(--step-2); }
+.quest {
+  background: var(--night-2); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 0.75rem 0.95rem; font-size: var(--step--1); display: grid; gap: 0.2rem;
+}
+.quest b { font-family: var(--font-label); font-weight: 400; letter-spacing: 0.1em; color: var(--lantern); }
+
+details.tale { border-top: 1px dashed var(--rule); padding-top: 0.5rem; }
+details.tale summary {
+  cursor: pointer; font-family: var(--font-display); font-style: italic; color: var(--lantern);
+  list-style: none; display: inline-flex; gap: 0.4rem; align-items: center;
+}
+details.tale summary::-webkit-details-marker { display: none; }
+details.tale summary::before { content: "\2726"; font-style: normal; font-size: 0.8em; }
+details.tale[open] summary { margin-bottom: 0.5rem; }
+details.tale p { font-family: var(--font-display); font-size: var(--step-1); line-height: 1.5; color: var(--bone); }
+
+/* ---------- Hunt ---------- */
+.hunt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem; }
+.score { font-family: var(--font-display); font-size: var(--step-2); font-variant-numeric: tabular-nums; }
+.score span { color: var(--lantern); }
+.rank { font-size: var(--step--1); color: var(--bone-dim); }
+.meter { height: 6px; background: var(--night-2); border-radius: 3px; overflow: hidden; border: 1px solid var(--rule); }
+.meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ember), var(--lantern)); transition: width .4s ease; }
+.hunt { display: grid; grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); gap: 0.6rem; }
+.hunt input { position: absolute; opacity: 0; pointer-events: none; }
+.hunt label {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 0.6rem; align-items: center;
+  padding: 0.65rem 0.8rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--night-2);
+  cursor: pointer; transition: border-color .2s, background .2s; height: 100%;
+}
+.hunt label:hover { border-color: var(--bone-dim); }
+.hunt .box {
+  width: 1.2rem; height: 1.2rem; border: 1.5px solid var(--bone-dim); border-radius: 50%;
+  display: grid; place-items: center; font-size: 0.75rem; color: var(--night);
+}
+.hunt .pts { font-size: var(--step--1); color: var(--bone-dim); font-variant-numeric: tabular-nums; }
+.hunt input:checked + label { border-color: var(--lantern); background: color-mix(in srgb, var(--lantern) 10%, var(--night-2)); }
+.hunt input:checked + label .box { background: var(--lantern); border-color: var(--lantern); }
+.hunt input:checked + label .box::after { content: "\2713"; }
+.reset {
+  justify-self: start; background: none; border: 1px solid var(--rule); color: var(--bone-dim);
+  font: inherit; font-size: var(--step--1); padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer;
+}
+.reset:hover { color: var(--bone); border-color: var(--bone-dim); }
+
+/* ---------- Quiz ---------- */
+.quiz { display: grid; gap: 1.5rem; }
+.q { display: grid; gap: 0.6rem; }
+.q p { font-family: var(--font-display); font-size: var(--step-1); }
+.opts { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.opts button {
+  font: inherit; font-size: var(--step--1); background: var(--night-2); color: var(--bone);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 0.45rem 0.95rem; cursor: pointer;
+}
+.opts button:hover:not(:disabled) { border-color: var(--bone-dim); }
+.opts button.right { border-color: var(--lantern); color: var(--lantern); }
+.opts button.wrong { border-color: var(--ember); color: #f2b59a; text-decoration: line-through; }
+.opts button:disabled { cursor: default; }
+.why { font-size: var(--step--1); color: var(--bone-dim); }
+
+/* ---------- Kit ---------- */
+.kit { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.5rem 2rem; }
+.kit h3 { font-size: var(--step-1); color: var(--lantern); margin-bottom: 0.4rem; }
+.kit ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.kit li::marker { color: var(--lantern); }
+
+footer { padding-block: 2.5rem 3rem; font-size: var(--step--1); color: var(--bone-dim); }
+footer .wrap { display: grid; gap: 0.75rem; }
+footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+@media (max-width: 30rem) {
+  .timeline li { grid-template-columns: 4.2rem 1fr; gap: 0.75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meter i { transition: none; }
+}
+</style>
+
+<header class="hero">
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="eyebrow">A Halloween adventure walk · Gifford, East Lothian</p>
+    <h1>The <em>Goblin Ha'</em> Walk</h1>
+    <p class="lede">A woodland ramble to Yester Castle, where a 13th-century wizard is said to have raised an army of hobgoblins to build his halls.</p>
+    <div class="facts">
+      <span><b>~3 km</b> there and back</span>
+      <span><b>~1 hr</b> walking</span>
+      <span><b>~100 m</b> of climb</span>
+      <span><b>55.8906°N, 2.7105°W</b></span>
+    </div>
+    <p class="hint">Move your lantern over the sky to look for the castle.</p>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <div class="notice" role="note">
+        <strong>Before you set out</strong>
+        <p>The Goblin Ha' vault has been closed to the public since October 2021, when thieves took stone from the wall that holds it up, and the entrance lock was cut in a later break-in. You can still walk to the castle and look at the ruins from outside for free. Stay out of the tunnel and vault, and check the latest access news before you go.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="legend">
+    <div class="wrap">
+      <p class="eyebrow">The legend</p>
+      <h2>The Wizard of Yester</h2>
+      <div class="prose">
+        <p>Around 1155 the barony of Yester was granted by King Malcolm IV, and William the Lion confirmed it to a Norman family called Giffard. The name Yester comes from the old Brythonic word <i>ystrad</i>, meaning a valley or strath. Latin clerks spelled it "Zester".</p>
+        <p>The most famous Giffard was <b>Sir Hugo de Giffard</b>, a guardian of the boy-king Alexander III, who died in 1267. His neighbours whispered that he was a warlock and a necromancer. They said he struck a bargain with the Devil, who lent him a crew of hobgoblins, and that these goblins dug the great vaulted cavern under the castle in a single night.</p>
+        <blockquote>Old tales tell that his castle, or at least the cave and keep, were wrought by witchcraft.<cite>Paraphrasing the 15th-century chronicler Walter Bower, who called the cavern "Bo' Hall"</cite></blockquote>
+        <p>Four hundred years later Sir Walter Scott put Hugo into his 1808 poem <i>Marmion</i>. In Canto III the innkeeper at Gifford tells of the old lord, and Scott names him "the founder of the Goblin-Hall". The vault has been called the Goblin Ha' (say it "Haw") ever since.</p>
+        <p><b>The cursed pear.</b> One more tale follows Hugo's family. He is said to have given his daughter Margaret a pear as a wedding gift and warned that if harm ever came to it, the family's luck would end. In 1692, the story goes, a new bride at Colstoun House took a bite of it, and misfortune followed. The bitten pear is said to survive there still. Nobody has found a written record of any of this, which makes it a perfect tale for a dark walk.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="history">
+    <div class="wrap">
+      <p class="eyebrow">Eight centuries in the woods</p>
+      <h2>What really happened here</h2>
+      <ol class="timeline">
+        <li><span class="yr">c.1155</span><span class="ev">Malcolm IV grants the barony of Yester. William the Lion confirms it to Hugo de Giffard, a Norman settler.</span></li>
+        <li class="spooky"><span class="yr">pre-1267</span><span class="ev">The first stone castle and the underground hall are built. Goblins, according to legend.</span></li>
+        <li><span class="yr">1278</span><span class="ev">King Alexander III stays at Yester around 24 May and writes letters to Edward I of England from here.</span></li>
+        <li><span class="yr">1298</span><span class="ev">Alexander de Welles is killed at the Battle of Falkirk. Edward I later hands Yester lands to Adam de Welles.</span></li>
+        <li><span class="yr">1357</span><span class="ev">Heiress Joanna Giffard marries a de la Haye. The Hay family has held the barony ever since.</span></li>
+        <li><span class="yr">1487</span><span class="ev">John Hay becomes the first Lord Hay of Yester.</span></li>
+        <li class="spooky"><span class="yr">1513</span><span class="ev">The 2nd Lord Hay is killed at the Battle of Flodden.</span></li>
+        <li class="spooky"><span class="yr">May 1544</span><span class="ev">English soldiers marching home from burning Edinburgh set fire to the castle, the village and the harvest.</span></li>
+        <li><span class="yr">1547</span><span class="ev">The 4th Lord defends the castle, is captured at the Battle of Pinkie and spends three years in the Tower of London.</span></li>
+        <li><span class="yr">Feb 1548</span><span class="ev">Lord Grey of Wilton takes the castle. Two men are said to have been made to fight a duel in Haddington market place for insulting the boy-king Edward VI.</span></li>
+        <li><span class="yr">1557</span><span class="ev">The family moves to a new tower house where Yester House stands today. The old castle begins to crumble.</span></li>
+        <li><span class="yr">1646</span><span class="ev">The 8th Lord is made Marquess of Tweeddale.</span></li>
+        <li class="spooky"><span class="yr">to 1737</span><span class="ev">The Marquess's falconer lives and keeps his birds in the Goblin Ha'.</span></li>
+        <li class="spooky"><span class="yr">2021</span><span class="ev">Thieves steal stone from the wall under the vault. The castle closes to visitors.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="route">
+    <div class="wrap">
+      <p class="eyebrow">The route</p>
+      <h2>Follow the lantern line</h2>
+      <dl class="stats">
+        <div><dt>Distance</dt><dd>3 km <small>return</small></dd></div>
+        <div><dt>Climb</dt><dd>100 m</dd></div>
+        <div><dt>Time</dt><dd>1 hr <small>+ goblin hunting</small></dd></div>
+        <div><dt>Start grid ref</dt><dd>NT 566 674</dd></div>
+      </dl>
+      <p class="muted">The shortest way in starts at Danskine Lodge on the B6355, about 2 miles east of Gifford (postcode EH41 4PJ). Parking there is tight, so park on a verge east past Danskine Farm and walk back to the gate opposite Danskine Loch. For a longer outing, start in Gifford, where there is plenty of parking opposite the village park, and follow the Yester path about 1.5 miles through the woods each way. Paths near the castle are confusing, so carry an OS map.</p>
+
+      <ol class="trail">
+        <li class="stop">
+          <span class="n">1</span>
+          <div class="body">
+            <h3>The Gatehouse</h3>
+            <p>Start at Danskine Lodge, opposite the dark water of Danskine Loch. Pick up the forest track and head into the trees.</p>
+            <div class="quest"><b>Quest</b>Everyone chooses a goblin name for the walk. Use it until you're back at this gate.</div>
+            <details class="tale"><summary>Read aloud at the gate</summary>
+              <p>Long ago, the lord of Yester needed a hall under the hill, deep enough that no army could find it. Masons said it would take ten years. Sir Hugo said it would be done by morning. That night the villagers heard picks ringing in the woods, and laughter that did not sound like men.</p>
+            </details>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="n">2</span>
+          <div class="body">
+            <h3>Along the Gifford Water</h3>
+            <p>The track follows the burn through the trees. It is very muddy in places, so this is where wellies earn their keep.</p>
+            <div class="quest"><b>Quest</b>Find the deepest footprint in the mud. Goblin or walker? Make your case.</div>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="n">3</span>
+          <div class="body">
+            <h3>The Waterfall and the First Bridge</h3>
+            <p>Listen for the waterfall, then cross the bridge over the Gifford Water.</p>
+            <div class="quest"><b>Quest</b>Everyone falls silent for thirty seconds on the bridge. What can you hear under the water noise?</div>
+            <details class="tale"><summary>Read aloud on the bridge</summary>
+              <p>Goblins cannot cross running water carrying anything they stole. That is why, the old folk said, the Yester goblins left their treasure on the far bank. If you find a strange stone on the path, leave it be. Someone may be coming back for it.</p>
+            </details>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="n">4</span>
+          <div class="body">
+            <h3>Shank Lea Wood</h3>
+            <p>Just before the Hopes Burn, go through Shank Lea Wood and take the path that drops down to the right.</p>
+            <div class="quest"><b>Quest</b>Spot a face in a tree trunk. The person who finds the grumpiest one leads the next stretch.</div>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="n">5</span>
+          <div class="body">
+            <h3>The Hopes Water Bridge</h3>
+            <p>Keep ahead until a bridge over the Hopes Water appears on your right. Cross it. The castle mound rises ahead, hidden by trees the Marquess of Tweeddale planted in the 1800s.</p>
+            <div class="quest"><b>Quest</b>Whoever first glimpses stone through the trees shouts the password: "Giffard!"</div>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="n">6</span>
+          <div class="body">
+            <h3>Yester Castle</h3>
+            <p>Walk around the outside of the ruins. Parts of the old courtyard wall still stand about 9 metres high, and about 12 metres where the hill falls away. At the foot of the wall, a pair of arched doorways behind iron grilles leads down to the Goblin Ha'. Peer in, but don't go in. The ruins aren't maintained and the vault is closed for safety.</p>
+            <div class="quest"><b>Quest</b>Stand in front of the grilles and count to thirteen out loud. Then listen. Nobody is allowed to say what they heard until you're back at the gate.</div>
+            <details class="tale"><summary>Read aloud at the grilles</summary>
+              <p>Inside, a passage cut through the rock leads into a hall with a pointed roof and a fireplace high on the wall. Beyond it, steps go down into the hill to an old well. People who came here in daylight said it was cold, quiet and peaceful. Nobody says what it's like at night. The falconer slept down there with his birds until 1737. He never wrote down what kept him company.</p>
+            </details>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="n">7</span>
+          <div class="body">
+            <h3>The Way Home</h3>
+            <p>Go back the way you came. Danskine walkers return to the lodge. Gifford walkers can finish at the Goblin Ha' Hotel in the village, named after the vault.</p>
+            <div class="quest"><b>Quest</b>On the walk back, nobody looks over their shoulder. If you do, you have to walk at the back.</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="hunt">
+    <div class="wrap">
+      <p class="eyebrow">Goblin hunt</p>
+      <div class="hunt-head">
+        <h2>Spot it, tick it</h2>
+        <div>
+          <p class="score"><span id="score">0</span> / <span id="max">0</span> goblin points</p>
+          <p class="rank" id="rank">Rank: Lost Villager</p>
+        </div>
+      </div>
+      <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <div class="hunt" id="huntList"></div>
+      <button class="reset" id="reset" type="button">Clear my ticks</button>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="wrap">
+      <p class="eyebrow">Wizard's riddles</p>
+      <h2>Answer on the walk home</h2>
+      <p class="muted">Each riddle is answered somewhere on this page. You get one guess per riddle.</p>
+      <div class="quiz" id="quizBox"></div>
+      <p class="score" id="quizScore" hidden></p>
+    </div>
+  </section>
+
+  <section id="kit">
+    <div class="wrap">
+      <p class="eyebrow">Field kit</p>
+      <h2>Pack like a goblin hunter</h2>
+      <div class="kit">
+        <div>
+          <h3>Bring</h3>
+          <ul>
+            <li>Wellies or boots. The paths are very muddy.</li>
+            <li>A head torch or lantern for each person, with spare batteries.</li>
+            <li>Warm layers. The castle mound is chilly even in daylight.</li>
+            <li>An OS map or a downloaded offline map.</li>
+            <li>A flask of something hot and a bag of "goblin gold" chocolate coins.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Timing</h3>
+          <ul>
+            <li>At the end of October the sun sets around 4:30–4:40pm in East Lothian.</li>
+            <li>Set off by about 3pm to reach the castle in the eerie golden hour and get back to the road by dusk.</li>
+            <li>The woods get dark fast under the trees, long before the sky does.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Stay safe</h3>
+          <ul>
+            <li>Don't enter the Goblin Ha' tunnel or vault. It's closed and the wall is damaged.</li>
+            <li>Don't climb on the ruins. It's a protected Scheduled Ancient Monument and nothing is maintained.</li>
+            <li>There's no public transport within a mile, so plan how you'll get there.</li>
+            <li>Don't block gates or farm tracks when you park.</li>
+            <li>Take nothing but photos. Even a pebble from the walls is part of the monument.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Legends are retold for fun. Dates and facts come from the sources below. Access arrangements can change, so check before you go.</p>
+    <ul>
+      <li><a href="https://en.wikipedia.org/wiki/Yester_Castle">Yester Castle, Wikipedia</a></li>
+      <li><a href="https://canmore.org.uk/site/56062">Yester Castle and Goblin Ha', Canmore</a></li>
+      <li><a href="https://sobt.co.uk/walk-yester-castle/">Walk: Yester Castle from Danskine Lodge</a></li>
+      <li><a href="https://www.stravaiging.com/blog/yester-castle-and-the-goblin-ha">Yester Castle and the Goblin Ha', Stravaiging</a></li>
+      <li><a href="https://news.stv.tv/east-central/medieval-castle-closed-to-public-after-substantial-theft-of-stone">Castle closed after stone theft, STV News</a></li>
+      <li><a href="https://outaboutscotland.com/yester-castle-goblin-ha/">Yester Castle, Out About Scotland</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // ---------- Hero sky: stars, moon, castle silhouette revealed by a lantern ----------
+  const canvas = document.getElementById('sky');
+  const ctx = canvas.getContext('2d');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, dpr = 1, stars = [], lamp = { x: 0.78, y: 0.55 }, target = { x: 0.78, y: 0.55 }, t = 0;
+
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = Array.from({ length: Math.round(W * H / 3500) }, () => ({
+      x: Math.random() * W, y: Math.random() * H * 0.75, r: Math.random() * 1.2 + 0.2, p: Math.random() * 6.28
+    }));
+  }
+
+  function castle(x0, base, s) {
+    // Ruined curtain wall and broken tower on a wooded mound
+    ctx.beginPath();
+    ctx.moveTo(x0 - 220 * s, base);
+    ctx.quadraticCurveTo(x0 - 120 * s, base - 60 * s, x0 - 60 * s, base - 70 * s);
+    ctx.lineTo(x0 - 60 * s, base - 150 * s);
+    ctx.lineTo(x0 - 48 * s, base - 150 * s); ctx.lineTo(x0 - 48 * s, base - 140 * s);
+    ctx.lineTo(x0 - 36 * s, base - 140 * s); ctx.lineTo(x0 - 36 * s, base - 158 * s);
+    ctx.lineTo(x0 - 18 * s, base - 170 * s); ctx.lineTo(x0 - 10 * s, base - 150 * s);
+    ctx.lineTo(x0 + 10 * s, base - 150 * s); ctx.lineTo(x0 + 14 * s, base - 120 * s);
+    ctx.lineTo(x0 + 60 * s, base - 118 * s); ctx.lineTo(x0 + 66 * s, base - 128 * s);
+    ctx.lineTo(x0 + 80 * s, base - 108 * s); ctx.lineTo(x0 + 110 * s, base - 104 * s);
+    ctx.lineTo(x0 + 115 * s, base - 80 * s);
+    ctx.quadraticCurveTo(x0 + 200 * s, base - 50 * s, x0 + 320 * s, base);
+    ctx.closePath();
+    ctx.fill();
+    // Goblin Ha' arches, glowing faintly
+    ctx.save();
+    ctx.fillStyle = 'rgba(240,164,58,' + (0.25 + 0.15 * Math.sin(t * 2)) + ')';
+    [-14, 4].forEach(dx => {
+      ctx.beginPath();
+      ctx.moveTo(x0 + dx * s, base - 72 * s);
+      ctx.lineTo(x0 + dx * s, base - 88 * s);
+      ctx.arc(x0 + (dx + 6) * s, base - 88 * s, 6 * s, Math.PI, 0);
+      ctx.lineTo(x0 + (dx + 12) * s, base - 72 * s);
+      ctx.closePath(); ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  function trees(base, s, seed) {
+    for (let i = 0; i < 40; i++) {
+      const x = ((i * 97 + seed) % 1000) / 1000 * W;
+      const h = (60 + ((i * 53 + seed) % 70)) * s;
+      ctx.beginPath();
+      ctx.moveTo(x - 14 * s, base); ctx.lineTo(x, base - h); ctx.lineTo(x + 14 * s, base);
+      ctx.fill();
+    }
+  }
+
+  function draw() {
+    t += 0.016;
+    lamp.x += (target.x - lamp.x) * 0.08; lamp.y += (target.y - lamp.y) * 0.08;
+    ctx.clearRect(0, 0, W, H);
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0b1013'); g.addColorStop(1, '#141c1f');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    stars.forEach(s => {
+      ctx.globalAlpha = 0.35 + 0.35 * Math.sin(t * 1.5 + s.p);
+      ctx.fillStyle = '#e9e1cc';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    // moon
+    const mx = W * 0.86, my = H * 0.2, mr = Math.max(18, Math.min(W, H) * 0.06);
+    const mg = ctx.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 4);
+    mg.addColorStop(0, 'rgba(233,225,204,0.18)'); mg.addColorStop(1, 'rgba(233,225,204,0)');
+    ctx.fillStyle = mg; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#e9e1cc'; ctx.beginPath(); ctx.arc(mx, my, mr, 0, 6.28); ctx.fill();
+    ctx.fillStyle = '#0d1315'; ctx.beginPath(); ctx.arc(mx - mr * 0.35, my - mr * 0.1, mr * 0.92, 0, 6.28); ctx.fill();
+
+    // castle + trees in a "lit" layer and a "dark" layer
+    const s = Math.max(0.6, Math.min(1.3, W / 900));
+    const base = H;
+    ctx.fillStyle = '#070a0b';
+    castle(W * 0.74, base, s);
+    trees(base, s * 0.9, 31);
+
+    // lantern light reveals moss and stone
+    const lx = lamp.x * W, ly = lamp.y * H, lr = Math.max(140, W * 0.18);
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-atop';
+    const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
+    lg.addColorStop(0, 'rgba(240,164,58,0.55)');
+    lg.addColorStop(0.45, 'rgba(70,90,72,0.45)');
+    lg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+    // halo
+    const hg = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr * 0.9);
+    hg.addColorStop(0, 'rgba(240,164,58,0.10)'); hg.addColorStop(1, 'rgba(240,164,58,0)');
+    ctx.fillStyle = hg; ctx.fillRect(0, 0, W, H);
+
+    // dim the left side so the headline stays readable
+    const shade = ctx.createLinearGradient(0, 0, W, 0);
+    shade.addColorStop(0, 'rgba(15,20,22,0.75)'); shade.addColorStop(0.6, 'rgba(15,20,22,0.15)'); shade.addColorStop(1, 'rgba(15,20,22,0)');
+    ctx.fillStyle = shade; ctx.fillRect(0, 0, W, H);
+
+    if (!reduce) requestAnimationFrame(draw);
+  }
+
+  const hero = document.querySelector('.hero');
+  function move(e) {
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    target.x = (p.clientX - r.left) / r.width; target.y = (p.clientY - r.top) / r.height;
+    if (reduce) { lamp.x = target.x; lamp.y = target.y; draw(); }
+  }
+  hero.addEventListener('pointermove', move);
+  hero.addEventListener('touchmove', move, { passive: true });
+  window.addEventListener('resize', () => { resize(); if (reduce) draw(); });
+  resize(); draw();
+
+  // ---------- Goblin hunt ----------
+  const items = [
+    ['waterfall', 'The waterfall on the Gifford Water', 2],
+    ['bridges', 'Both bridges crossed', 2],
+    ['face', 'A face in a tree trunk', 3],
+    ['fungus', 'A toadstool or bracket fungus', 2],
+    ['ivy', 'Ivy climbing the castle stones', 1],
+    ['wall', 'The tallest stretch of curtain wall', 2],
+    ['grilles', 'The iron grilles of the Goblin Ha\'', 3],
+    ['door', 'A doorway you\'d have to crouch through', 3],
+    ['crow', 'A crow, rook or raven', 2],
+    ['owl', 'An owl hoot (it counts if you only hear it)', 4],
+    ['web', 'A spider web with dew or rain on it', 2],
+    ['leaf', 'A perfect red or gold leaf', 1],
+    ['moon', 'The moon through the branches', 3],
+    ['footprint', 'An animal track in the mud', 2],
+  ];
+  const KEY = 'goblin-hunt-v1';
+  let got = {};
+  try { got = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { got = {}; }
+  const list = document.getElementById('huntList');
+  const max = items.reduce((a, i) => a + i[2], 0);
+  document.getElementById('max').textContent = max;
+  items.forEach(([id, label, pts]) => {
+    const wrap = document.createElement('div');
+    wrap.style.position = 'relative';
+    wrap.innerHTML = '<input type="checkbox" id="h-' + id + '"><label for="h-' + id + '"><span class="box"></span><span>' + label + '</span><span class="pts">+' + pts + '</span></label>';
+    const cb = wrap.querySelector('input');
+    cb.checked = !!got[id];
+    cb.addEventListener('change', () => { got[id] = cb.checked; save(); tally(); });
+    list.appendChild(wrap);
+  });
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(got)); } catch (e) {} }
+  const ranks = [[0, 'Lost Villager'], [6, 'Apprentice Goblin-Spotter'], [14, 'Keeper of the Lantern'], [22, 'Falconer of the Ha\''], [30, 'Wizard of Yester']];
+  function tally() {
+    const sc = items.reduce((a, i) => a + (got[i[0]] ? i[2] : 0), 0);
+    document.getElementById('score').textContent = sc;
+    document.getElementById('meter').style.width = (sc / max * 100) + '%';
+    let r = ranks[0][1];
+    ranks.forEach(([n, name]) => { if (sc >= n) r = name; });
+    document.getElementById('rank').textContent = 'Rank: ' + r;
+  }
+  document.getElementById('reset').addEventListener('click', () => {
+    got = {}; save();
+    list.querySelectorAll('input').forEach(c => { c.checked = false; });
+    tally();
+  });
+  tally();
+
+  // ---------- Quiz ----------
+  const qs = [
+    ['Who did the legend say built the Goblin Ha\'?', ['Roman legionaries', 'Hobgoblins', 'Norwegian raiders'], 1, 'Sir Hugo de Giffard\'s hobgoblins, summoned with the Devil\'s help.'],
+    ['How do you say "Ha\'"?', ['Hah', 'Hay', 'Haw'], 2, 'It\'s "Haw", the Scots word for hall.'],
+    ['Which poet called Hugo "the founder of the Goblin-Hall"?', ['Robert Burns', 'Sir Walter Scott', 'Lord Byron'], 1, 'Scott, in Canto III of Marmion (1808).'],
+    ['Who lived in the Goblin Ha\' until 1737?', ['A falconer', 'A hermit', 'A smuggler'], 0, 'The Marquess of Tweeddale\'s falconer.'],
+    ['What cursed object did Hugo give his daughter?', ['A silver ring', 'A pear', 'A raven feather'], 1, 'The Colstoun pear, bitten by a bride in 1692, so the story goes.'],
+  ];
+  const box = document.getElementById('quizBox');
+  let answered = 0, right = 0;
+  qs.forEach(([q, opts, ans, why]) => {
+    const d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p></p><div class="opts"></div><span class="why" hidden></span>';
+    d.querySelector('p').textContent = q;
+    const o = d.querySelector('.opts');
+    opts.forEach((txt, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = txt;
+      b.addEventListener('click', () => {
+        o.querySelectorAll('button').forEach((x, j) => { x.disabled = true; if (j === ans) x.classList.add('right'); });
+        if (i !== ans) b.classList.add('wrong'); else right++;
+        const w = d.querySelector('.why'); w.textContent = why; w.hidden = false;
+        answered++;
+        if (answered === qs.length) {
+          const s = document.getElementById('quizScore');
+          s.innerHTML = '<span>' + right + '</span> / ' + qs.length + (right === qs.length ? ' · Sir Hugo would be proud.' : right >= 3 ? ' · The goblins let you pass.' : ' · The goblins are laughing.');
+          s.hidden = false;
+        }
+      });
+      o.appendChild(b);
+    });
+    box.appendChild(d);
+  });
+})();
+</script>
