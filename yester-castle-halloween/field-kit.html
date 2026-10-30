@@ -1,4 +1,6 @@
 <title>Goblin Ha' Field Kit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,14 +12,14 @@
   --night: #0f1416;
   --night-2: #172024;
   --bone: #e9e1cc;
-  --bone-dim: #a9a593;
+  --bone-dim: #bdb9a6;
   --lantern: #f0a43a;
   --ember: #c2552b;
   --rule: #2e3a3c;
   --font-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
   --font-label: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
   --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
-  --step--1: 0.875rem;
+  --step--1: 0.9375rem;
   --step-0: 1.0625rem;
   --step-1: 1.3rem;
   --step-2: 1.7rem;
@@ -115,6 +117,10 @@ section h2 { font-size: var(--step-3); }
   box-shadow: 0 0 30px color-mix(in srgb, var(--ember) 45%, transparent);
 }
 .sealed p { max-width: 30rem; }
+@media (max-width: 30rem) {
+  :root { --step--1: 1rem; --step-0: 1.0625rem; }
+  body { line-height: 1.55; }
+}
 footer { padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--bone-dim); }
 </style>
 

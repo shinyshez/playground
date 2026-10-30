@@ -1,4 +1,6 @@
 <title>The Goblin Ha' Walk</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,14 +14,14 @@
   --night-2: #172024;      /* raised stone */
   --moss: #2c3b2f;         /* lichen on the curtain wall */
   --bone: #e9e1cc;         /* parchment / text */
-  --bone-dim: #a9a593;     /* secondary text */
+  --bone-dim: #bdb9a6;     /* secondary text */
   --lantern: #f0a43a;      /* lantern flame accent */
   --ember: #c2552b;        /* warnings, embers */
   --rule: #2e3a3c;
   --font-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
   --font-label: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
   --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
-  --step--1: 0.875rem;
+  --step--1: 0.9375rem;
   --step-0: 1.0625rem;
   --step-1: 1.3rem;
   --step-2: 1.7rem;
@@ -309,6 +311,9 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 @keyframes appear { to { opacity: 1; } }
 
 @media (max-width: 30rem) {
+  :root { --step--1: 1rem; }
+  .stop { gap: 0.75rem; }
+  .scare-controls button { padding: 0.35rem 0.7rem; }
   .timeline li { grid-template-columns: 4.2rem 1fr; gap: 0.75rem; }
 }
 @media (prefers-reduced-motion: reduce) {
