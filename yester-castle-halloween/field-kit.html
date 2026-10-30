@@ -1,0 +1,266 @@
+<title>Goblin Ha' Field Kit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+/* Layout: a single folded "kit card" column: invitation, where to meet, a tickable packing list, then the small print. */
+:root {
+  color-scheme: dark;
+  --night: #0f1416;
+  --night-2: #172024;
+  --bone: #e9e1cc;
+  --bone-dim: #bdb9a6;
+  --lantern: #f0a43a;
+  --ember: #c2552b;
+  --rule: #2e3a3c;
+  --font-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --font-label: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
+  --step--1: 0.9375rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3rem;
+  --step-2: 1.7rem;
+  --step-3: 2.4rem;
+  --step-4: clamp(2.4rem, 7vw, 4.25rem);
+}
+* { box-sizing: border-box; }
+html { background: var(--night); }
+body {
+  background: var(--night); color: var(--bone);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.6;
+}
+a { color: var(--lantern); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--lantern); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; line-height: 1.1; margin: 0; }
+p { margin: 0; }
+.wrap {
+  max-width: 44rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.eyebrow { font-family: var(--font-label); letter-spacing: 0.14em; font-size: var(--step--1); color: var(--lantern); text-transform: lowercase; }
+.muted { color: var(--bone-dim); }
+
+header {
+  border-bottom: 1px solid var(--rule);
+  background:
+    radial-gradient(ellipse 60% 90% at 85% 0%, color-mix(in srgb, var(--lantern) 18%, transparent), transparent 70%),
+    var(--night);
+}
+header .wrap { padding-block: 4rem 3rem; display: grid; gap: 1rem; }
+header h1 { font-size: var(--step-4); }
+header h1 em { color: var(--lantern); }
+.lede { font-family: var(--font-display); font-style: italic; font-size: var(--step-1); max-width: 34rem; }
+
+section { padding-block: 3rem; border-bottom: 1px solid var(--rule); }
+section > .wrap { display: grid; gap: 1.25rem; }
+section h2 { font-size: var(--step-3); }
+
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 1px; margin: 0;
+  background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden;
+}
+.stats div { background: var(--night-2); padding: 0.85rem 1rem; display: grid; gap: 0.1rem; }
+.stats dt { font-family: var(--font-label); letter-spacing: 0.1em; font-size: var(--step--1); color: var(--bone-dim); }
+.stats dd { margin: 0; font-family: var(--font-display); font-size: var(--step-2); font-variant-numeric: tabular-nums; }
+.stats dd small { font-family: var(--font-body); font-size: var(--step--1); color: var(--bone-dim); }
+
+.meet { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+.meet > div { border: 1px solid var(--rule); border-radius: 6px; padding: 1rem 1.1rem; display: grid; gap: 0.4rem; align-content: start; min-width: 0; }
+.meet .primary { border-color: var(--lantern); }
+.meet h3 { font-size: var(--step-1); }
+.tag { font-family: var(--font-label); letter-spacing: 0.1em; font-size: var(--step--1); color: var(--lantern); }
+.copy {
+  justify-self: start; font: inherit; font-size: var(--step--1); cursor: pointer;
+  background: none; color: var(--bone-dim); border: 1px solid var(--rule); border-radius: 4px; padding: 0.25rem 0.6rem;
+}
+.copy:hover { color: var(--bone); border-color: var(--bone-dim); }
+
+.pack-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 0.75rem; }
+.count { font-family: var(--font-display); font-size: var(--step-1); font-variant-numeric: tabular-nums; }
+.count span { color: var(--lantern); }
+.pack { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.pack input { position: absolute; opacity: 0; pointer-events: none; }
+.pack label {
+  display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.8rem; align-items: start;
+  padding: 0.75rem 0.9rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--night-2); cursor: pointer;
+}
+.pack label:hover { border-color: var(--bone-dim); }
+.pack .box {
+  grid-row: span 2; margin-top: 0.2rem; width: 1.25rem; height: 1.25rem; border-radius: 4px;
+  border: 1.5px solid var(--bone-dim); display: grid; place-items: center; font-size: 0.8rem; color: var(--night);
+}
+.pack b { font-weight: 500; }
+.pack small { font-size: var(--step--1); color: var(--bone-dim); }
+.pack input:checked + label { border-color: var(--lantern); }
+.pack input:checked + label .box { background: var(--lantern); border-color: var(--lantern); }
+.pack input:checked + label .box::after { content: "\2713"; }
+.pack input:checked + label b { text-decoration: line-through; text-decoration-color: var(--lantern); }
+.pack input:focus-visible + label { outline: 2px solid var(--lantern); outline-offset: 3px; }
+
+.rules { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; max-width: 65ch; }
+.rules li::marker { color: var(--lantern); }
+.notice {
+  border: 1px solid var(--ember); background: color-mix(in srgb, var(--ember) 12%, var(--night));
+  padding: 1rem 1.15rem; border-radius: 6px;
+}
+.sealed {
+  text-align: center; display: grid; gap: 0.6rem; justify-items: center; padding-block: 1rem;
+}
+.sealed .seal {
+  width: 4.5rem; height: 4.5rem; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #d9693b, var(--ember) 60%, #7d2f17);
+  color: var(--bone); font-family: var(--font-display); font-size: var(--step-2);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--ember) 45%, transparent);
+}
+.sealed p { max-width: 30rem; }
+@media (max-width: 30rem) {
+  :root { --step--1: 1rem; --step-0: 1.0625rem; }
+  body { line-height: 1.55; }
+}
+footer { padding-block: 2rem 3rem; font-size: var(--step--1); color: var(--bone-dim); }
+</style>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">You're invited · Halloween adventure walk</p>
+    <h1>The <em>Goblin Ha'</em> Field Kit</h1>
+    <p class="lede">We're off on a woodland walk to the ruins of Yester Castle near Gifford in East Lothian. Here's everything you need to get there and come prepared. Everything else stays a surprise.</p>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">The walk</p>
+      <h2>How big an adventure?</h2>
+      <dl class="stats">
+        <div><dt>Distance</dt><dd>3 km <small>return</small></dd></div>
+        <div><dt>Climb</dt><dd>100 m</dd></div>
+        <div><dt>Time</dt><dd>1 hr <small>+ stops</small></dd></div>
+        <div><dt>Terrain</dt><dd>Woods <small>+ lots of mud</small></dd></div>
+      </dl>
+      <p class="muted">The walk follows easy woodland tracks beside a burn. It suits most ages and has no scrambling, but the paths are very muddy in places. There and back on the same route.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Where to meet</p>
+      <h2>Getting there</h2>
+      <div class="meet">
+        <div class="primary">
+          <span class="tag">Short walk</span>
+          <h3>Danskine Lodge</h3>
+          <p>On the B6355, about 2 miles east of Gifford, opposite Danskine Loch.</p>
+          <p class="muted">Postcode <b id="pc">EH41 4PJ</b> · Grid ref NT 566 674</p>
+          <p class="muted">Parking is very limited. Park on a verge east of Danskine Farm and walk back to the gate opposite the loch. Don't block gates or farm tracks.</p>
+          <button class="copy" type="button" data-copy="Danskine Lodge, B6355, Gifford EH41 4PJ">Copy address</button>
+        </div>
+        <div>
+          <span class="tag">Longer walk</span>
+          <h3>Gifford village</h3>
+          <p>Plenty of parking opposite the village park. Follow the Yester path through the woods, about 1.5 miles each way.</p>
+          <p class="muted">Allow an extra hour or so.</p>
+        </div>
+      </div>
+      <p class="muted">There's no public transport within a mile, so sort out lifts in advance.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Timing</p>
+      <h2>Beat the sunset</h2>
+      <ul class="rules">
+        <li>At the end of October the sun sets around 4:30–4:40pm in East Lothian.</li>
+        <li>Aim to set off by about 3pm so we get the golden light on the way out and are back at the cars by dusk.</li>
+        <li>It gets dark a little earlier under the trees, so torches come out sooner than you'd think.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="pack-head">
+        <div>
+          <p class="eyebrow">Packing list</p>
+          <h2>Pack like an explorer</h2>
+        </div>
+        <p class="count"><span id="packed">0</span> / <span id="total">0</span> packed</p>
+      </div>
+      <ul class="pack" id="pack">
+        <li><input type="checkbox" id="p-boots"><label for="p-boots"><span class="box"></span><b>Wellies or walking boots</b><small>The paths are gloriously muddy. Trainers will regret it.</small></label></li>
+        <li><input type="checkbox" id="p-torch"><label for="p-torch"><span class="box"></span><b>A torch or lantern for everyone</b><small>Head torches are ideal. Bring spare batteries.</small></label></li>
+        <li><input type="checkbox" id="p-layers"><label for="p-layers"><span class="box"></span><b>Warm layers, hat and gloves</b><small>It's chilly in the woods, even on a sunny afternoon.</small></label></li>
+        <li><input type="checkbox" id="p-rain"><label for="p-rain"><span class="box"></span><b>A waterproof jacket</b><small>It's Scotland in October.</small></label></li>
+        <li><input type="checkbox" id="p-map"><label for="p-map"><span class="box"></span><b>An OS map or offline map</b><small>Phone signal can wander off on its own out here.</small></label></li>
+        <li><input type="checkbox" id="p-phone"><label for="p-phone"><span class="box"></span><b>A fully charged phone</b><small>You'll want it on the day. That's all we're saying.</small></label></li>
+        <li><input type="checkbox" id="p-flask"><label for="p-flask"><span class="box"></span><b>A flask of something hot</b><small>Hot chocolate is traditional for adventurers.</small></label></li>
+        <li><input type="checkbox" id="p-coins"><label for="p-coins"><span class="box"></span><b>A bag of chocolate coins</b><small>You'll find out why.</small></label></li>
+        <li><input type="checkbox" id="p-brave"><label for="p-brave"><span class="box"></span><b>Your bravest face</b><small>Optional, but recommended.</small></label></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Ground rules</p>
+      <h2>Keep it safe, keep it lovely</h2>
+      <div class="notice">The castle's underground parts have been closed to the public since 2021 for safety. We'll enjoy the ruins from outside, and nobody goes into any tunnels or vaults.</div>
+      <ul class="rules">
+        <li>The ruins are a protected Scheduled Ancient Monument and aren't maintained, so no climbing on the walls.</li>
+        <li>Take nothing but photos. Every stone belongs to the monument.</li>
+        <li>Stick together in the woods, especially once the torches are on.</li>
+        <li>The site is free to visit, but check for any access news shortly before the day.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap sealed">
+      <span class="seal" aria-hidden="true">?</span>
+      <h2>The rest is a surprise</h2>
+      <p class="muted">Stories, quests and a few things that go bump are waiting on the trail. No peeking, no reading up. Just turn up ready for an adventure.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Afterwards, the Goblin Ha' Hotel in Gifford is a cosy spot for a warm-up.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const KEY = 'goblin-kit-v1';
+  let got = {};
+  try { got = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { got = {}; }
+  const boxes = [...document.querySelectorAll('#pack input')];
+  document.getElementById('total').textContent = boxes.length;
+  function tally() { document.getElementById('packed').textContent = boxes.filter(b => b.checked).length; }
+  boxes.forEach(b => {
+    b.checked = !!got[b.id];
+    b.addEventListener('change', () => {
+      got[b.id] = b.checked; tally();
+      try { localStorage.setItem(KEY, JSON.stringify(got)); } catch (e) {}
+    });
+  });
+  tally();
+
+  document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', () => {
+    const text = btn.dataset.copy;
+    const done = () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy address'; }, 1600); };
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents(document.getElementById('pc'));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Select and copy';
+    };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+  }));
+})();
+</script>

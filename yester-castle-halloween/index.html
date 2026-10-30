@@ -1,4 +1,6 @@
 <title>The Goblin Ha' Walk</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,14 +14,14 @@
   --night-2: #172024;      /* raised stone */
   --moss: #2c3b2f;         /* lichen on the curtain wall */
   --bone: #e9e1cc;         /* parchment / text */
-  --bone-dim: #a9a593;     /* secondary text */
+  --bone-dim: #bdb9a6;     /* secondary text */
   --lantern: #f0a43a;      /* lantern flame accent */
   --ember: #c2552b;        /* warnings, embers */
   --rule: #2e3a3c;
   --font-display: "IM Fell English", "Iowan Old Style", Georgia, serif;
   --font-label: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
   --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
-  --step--1: 0.875rem;
+  --step--1: 0.9375rem;
   --step-0: 1.0625rem;
   --step-1: 1.3rem;
   --step-2: 1.7rem;
@@ -269,12 +271,54 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
 }
 .scare-controls button[aria-pressed="true"] { color: var(--lantern); border-color: var(--lantern); }
 
+/* Cockapoo "wolf" */
+:root { --poo: #d9a066; --poo-dark: #b57a44; }
+.c-fur { fill: var(--poo); stroke: var(--poo-dark); stroke-width: 1.5; }
+.c-fur-dark { fill: var(--poo-dark); stroke: #8f5d31; stroke-width: 1.5; }
+.c-nose { fill: var(--maw); }
+.c-line { fill: none; stroke: var(--maw); stroke-width: 3; stroke-linecap: round; }
+.howl { background: radial-gradient(circle at 50% 22%, rgba(40, 44, 46, 0.97), rgba(5, 8, 10, 0.98) 55%); animation: fadeInOut 4s ease forwards; }
+.howl .moon {
+  position: absolute; left: 50%; top: 7%; width: min(38vw, 220px); max-width: 100%; aspect-ratio: 1; border-radius: 50%;
+  transform: translateX(-50%); background: radial-gradient(circle at 40% 38%, #fff6dc, var(--bone) 60%, #c9bf9f);
+  box-shadow: 0 0 70px rgba(233, 225, 204, 0.5);
+}
+.howl svg {
+  position: absolute; left: 50%; bottom: 0; width: min(86vw, 400px); height: auto; transform-origin: 50% 100%;
+  transform: translate(-50%, 100%); animation: howlRise 3.8s cubic-bezier(.3, 1.4, .5, 1) forwards;
+}
+@keyframes howlRise {
+  0% { transform: translate(-50%, 100%); }
+  14% { transform: translate(-50%, 0) rotate(0); }
+  30%, 62% { transform: translate(-50%, 0) rotate(-3deg); }
+  46% { transform: translate(-50%, 0) rotate(3deg); }
+  70% { transform: translate(-50%, 0) rotate(8deg); }
+  86% { transform: translate(-50%, 0) rotate(8deg); }
+  100% { transform: translate(-50%, 105%) rotate(0); }
+}
+.howl .awoo {
+  position: absolute; left: 0; right: 0; top: 34%; text-align: center; padding-inline: 1rem;
+  font-family: var(--font-display); font-size: clamp(2.4rem, 10vw, 5.5rem); color: var(--bone);
+  text-shadow: 0 0 22px rgba(233, 225, 204, 0.6);
+}
+.howl .awoo span { display: inline-block; animation: bob 0.45s ease-in-out infinite alternate; }
+@keyframes bob { to { transform: translateY(-14px); } }
+.howl .caption {
+  position: absolute; left: 0; right: 0; top: calc(34% + clamp(3.4rem, 13vw, 7rem)); text-align: center; padding-inline: 1rem;
+  font-family: var(--font-display); font-style: italic; font-size: var(--step-2); color: var(--lantern);
+  opacity: 0; animation: appear 0.4s ease 2.1s forwards;
+}
+@keyframes appear { to { opacity: 1; } }
+
 @media (max-width: 30rem) {
+  :root { --step--1: 1rem; }
+  .stop { gap: 0.75rem; }
+  .scare-controls button { padding: 0.35rem 0.7rem; }
   .timeline li { grid-template-columns: 4.2rem 1fr; gap: 0.75rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .meter i { transition: none; }
-  .bat svg, .big svg, .big::before, .peek svg, .eyes span, .whisper p, .shake { animation-duration: 0.01s; animation-iteration-count: 1; }
+  .bat svg, .big svg, .big::before, .peek svg, .eyes span, .whisper p, .shake, .howl svg, .howl .awoo span { animation-duration: 0.01s; animation-iteration-count: 1; }
 }
 </style>
 
@@ -390,7 +434,7 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
         <li class="stop">
           <span class="n">4</span>
           <div class="body">
-            <h3>Shank Lea Wood</h3>
+            <h3 data-scare="howl">Shank Lea Wood</h3>
             <p>Just before the Hopes Burn, go through Shank Lea Wood and take the path that drops down to the right. If you find yourself in Edinburgh, you've gone too far, but well done on the walk.</p>
             <div class="quest"><b>Quest</b>Find a face in a tree trunk. Trees make faces for the same reason people do: they're pleased to see you. Whoever finds the grumpiest one leads the next stretch.</div>
           </div>
@@ -457,36 +501,8 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     <div class="wrap">
       <p class="eyebrow">Field kit</p>
       <h2>Pack like a goblin hunter</h2>
-      <div class="kit">
-        <div>
-          <h3>Bring</h3>
-          <ul>
-            <li>Wellies or boots. The paths are very muddy, gloriously so.</li>
-            <li>A torch or lantern for everyone, with spare batteries. Torchlight in a wood is half the magic.</li>
-            <li>Warm layers. The castle mound is chilly even in daylight.</li>
-            <li>An OS map or a downloaded offline map. Your phone signal may decide to wander off and explore on its own.</li>
-            <li>A flask of something hot and a bag of chocolate coins, henceforth known as goblin gold.</li>
-          </ul>
-        </div>
-        <div>
-          <h3>Timing</h3>
-          <ul>
-            <li>At the end of October the sun sets around 4:30–4:40pm in East Lothian. That means a wonderful golden glow for the walk out.</li>
-            <li>Set off by about 3pm to reach the castle in the golden hour and get back to the road by dusk.</li>
-            <li>It gets dark under the trees a little earlier, which is perfect for spotting lantern-light.</li>
-          </ul>
-        </div>
-        <div>
-          <h3>Stay safe</h3>
-          <ul>
-            <li>Don't go into the Goblin Ha' tunnel or vault. It's closed and the wall is damaged. Of everything on this page, this is the bit to take seriously.</li>
-            <li>Don't climb on the ruins. They're a protected Scheduled Ancient Monument, nothing is maintained, and the old stones deserve a rest after about 750 years of hard work.</li>
-            <li>There's no public transport within a mile, so sort out how you're getting there before you set off.</li>
-            <li>Don't block gates or farm tracks when you park. Happy farmers make for happy walkers.</li>
-            <li>Take nothing but photos. Even a pebble from the walls is part of the monument. Leave it for the next goblin hunter.</li>
-          </ul>
-        </div>
-      </div>
+      <p class="prose">Where to meet, when to set off, what to bring and the ground rules are all in the field kit. It has no spoilers, so you can send it to everyone before the walk.</p>
+      <p><a href="https://claude.ai/artifact/2NUuxp9rGxwmNrFVGdViGf">Open the field kit</a></p>
     </div>
   </section>
 </main>
@@ -787,6 +803,16 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
       [0, 0.14, 0.28, 0.42, 0.56].forEach((d, i) => tone(a, 'square', 620 - i * 40, 380 - i * 30, 0.11, 0.08 * vol, t + d)); },
     drone() { const a = ac(); if (!a) return; const t = a.currentTime;
       tone(a, 'sine', 55, 48, 3, 0.3, t); tone(a, 'triangle', 82, 70, 3, 0.1, t); },
+    howl() { const a = ac(); if (!a) return; const t = a.currentTime;
+      const o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(380, t); o.frequency.linearRampToValueAtTime(720, t + 0.6);
+      o.frequency.setValueAtTime(720, t + 1.4); o.frequency.linearRampToValueAtTime(420, t + 2.3);
+      lfo.frequency.value = 6; lg.gain.value = 14; lfo.connect(lg).connect(o.frequency);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.2, t + 0.3);
+      g.gain.setValueAtTime(0.2, t + 1.8); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.4);
+      o.connect(g).connect(a.destination); o.start(t); lfo.start(t); o.stop(t + 2.5); lfo.stop(t + 2.5);
+      tone(a, 'square', 330, 160, 0.12, 0.12, t + 2.6); },
     breath() { const a = ac(); if (!a) return; const t = a.currentTime; noise(a, 1.8, 700, 0.35, t); },
   };
 
@@ -795,6 +821,30 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
     document.body.appendChild(el);
     setTimeout(() => el.remove(), ms);
     return el;
+  }
+  function fluff(cx, cy, rx, ry, n, r, cls) {
+    let out = '<ellipse class="' + cls + '" cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '"/>';
+    for (let i = 0; i < n; i++) {
+      const a = i / n * Math.PI * 2;
+      out += '<circle class="' + cls + '" cx="' + (cx + Math.cos(a) * rx).toFixed(1) + '" cy="' + (cy + Math.sin(a) * ry).toFixed(1) + '" r="' + r + '"/>';
+    }
+    return out;
+  }
+  // A fluffy cockapoo, head thrown back mid-howl
+  function cockapoo() {
+    return '<svg viewBox="0 0 260 300">' +
+      fluff(212, 232, 14, 12, 7, 9, 'c-fur') +
+      fluff(150, 225, 55, 60, 16, 16, 'c-fur') +
+      fluff(118, 282, 14, 12, 6, 9, 'c-fur') + fluff(162, 284, 14, 12, 6, 9, 'c-fur') +
+      fluff(120, 160, 32, 40, 10, 13, 'c-fur') +
+      fluff(105, 105, 34, 32, 12, 13, 'c-fur') +
+      fluff(112, 76, 16, 10, 6, 8, 'c-fur') +
+      '<g transform="rotate(50 78 72)">' + fluff(78, 72, 22, 13, 8, 8, 'c-fur') + '</g>' +
+      '<circle class="c-nose" cx="61" cy="51" r="7"/>' +
+      '<ellipse class="c-nose" cx="74" cy="76" rx="6" ry="8" transform="rotate(40 74 76)"/>' +
+      '<path class="c-line" d="M92 96 Q99 89 106 96"/>' +
+      fluff(128, 140, 12, 28, 9, 10, 'c-fur-dark') +
+      '</svg>';
   }
   const goblinSVG = '<svg viewBox="0 0 240 240"><use href="#goblin"/></svg>';
   const scares = {
@@ -830,6 +880,13 @@ footer ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
       const el = layer('whisper', 2700); const p = document.createElement('p');
       p.textContent = src.dataset.text || 'Behind you…'; el.appendChild(p);
       if (prefs.sound) sound.breath();
+    },
+    howl() {
+      const el = layer('howl', 4100);
+      el.innerHTML = '<div class="moon"></div>' + cockapoo() +
+        '<p class="awoo">' + 'AWOOOOO!'.split('').map((c, i) => '<span style="animation-delay:' + (i * 0.06) + 's">' + c + '</span>').join('') + '</p>' +
+        '<p class="caption">…it\'s a cockapoo.</p>';
+      if (prefs.sound) sound.howl();
     },
     big() {
       layer('big', 1600).innerHTML = goblinSVG;
